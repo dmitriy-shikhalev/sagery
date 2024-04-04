@@ -3,7 +3,7 @@ name = "sagery"
 version = "0.1.0"
 description = ""
 authors = ["Dmitriy Shikhalev <dmitriy.shikhalev@gmail.com>"]
-license = "BSD"
+license = "BSD 3-Clause License"
 readme = "README.md"
 
 [tool.poetry.dependencies]
