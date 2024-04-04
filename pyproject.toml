@@ -5,6 +5,7 @@ description = ""
 authors = ["Dmitriy Shikhalev <dmitriy.shikhalev@gmail.com>"]
 license = "BSD 3-Clause License"
 readme = "README.md"
+packages = [{ include = "sagery" }]
 
 [tool.poetry.dependencies]
 python = "^3.12"
