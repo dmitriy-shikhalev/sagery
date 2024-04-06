@@ -1,4 +1,5 @@
 from sqlalchemy import Column
+from sqlalchemy import Enum
 from sqlalchemy import Table
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import DeclarativeBase
@@ -6,6 +7,8 @@ from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import MappedAsDataclass
 from sqlalchemy.orm import relationship
+
+from .status import JobStatus, RequestStatus
 
 
 class Base(MappedAsDataclass, DeclarativeBase):
@@ -55,6 +58,7 @@ class Job(Base):
     id: Mapped[int] = mapped_column(init=False, primary_key=True)
     datas: Mapped[list[Data]] = relationship(back_populates="job")
     requests: Mapped[list["Request"]] = relationship(back_populates="job")
+    status: JobStatus = Column(Enum(JobStatus), default=JobStatus.PENDING)
 
 
 class Request(Base):
@@ -67,6 +71,7 @@ class Request(Base):
     operator: Mapped["Operator"] = relationship(back_populates="requests")
     inputs: Mapped[list["Input"]] = relationship(back_populates="request")
     outputs: Mapped[list["Output"]] = relationship(back_populates="request")
+    status: RequestStatus = Column(Enum(RequestStatus), default=RequestStatus.PENDING)
 
 
 class Input(Base):
