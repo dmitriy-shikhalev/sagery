@@ -3,6 +3,7 @@ from enum import Enum
 
 class JobStatus(Enum):
     PENDING = 'PENDING'
+    BLOCKING = 'BLOCKING'
     RUNNING = 'RUNNING'
     DONE = 'DONE'
     FAILED = 'FAILED'
