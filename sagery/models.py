@@ -61,6 +61,18 @@ class Job(Base):
     status: JobStatus = Column(Enum(JobStatus), default=JobStatus.PENDING)
 
 
+class JobOperatorData(Base):
+    __tablename__ = "job_operator_data"
+
+    id: Mapped[int] = mapped_column(init=False, primary_key=True)
+    job_id: Mapped[int] = mapped_column(ForeignKey("job.id"))
+    job: Mapped[Job] = relationship(back_populates="job_operator_datas")
+    operator_name: Mapped[int] = mapped_column(ForeignKey("operator.name"))
+    operator: Mapped[Operator] = relationship(back_populates="job_operator_datas")
+    data_id: Mapped[int] = mapped_column(ForeignKey("data.id"))
+    data: Mapped[Data] = relationship(back_populates="job_operator_datas")
+
+
 class Request(Base):
     __tablename__ = "request"
 
