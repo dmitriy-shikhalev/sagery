@@ -81,11 +81,11 @@ class Request(Base):
     id: Mapped[int] = mapped_column(init=False, primary_key=True)
     job_id: Mapped[int] = mapped_column(ForeignKey("job.id"))
     job: Mapped["Job"] = relationship(back_populates="requests")
-    external_id: Mapped[str] = mapped_column(nullable=True, default=None)
     operator_name: Mapped[int] = mapped_column(ForeignKey("operator.name"))
     operator: Mapped["Operator"] = relationship(back_populates="requests")
     inputs: Mapped[list["Input"]] = relationship(back_populates="request")
     outputs: Mapped[list["Output"]] = relationship(back_populates="request")
+    external_id: Mapped[str] = mapped_column(nullable=True, default=None)
     status: RequestStatus = Column(Enum(RequestStatus), default=RequestStatus.PENDING)
 
 
