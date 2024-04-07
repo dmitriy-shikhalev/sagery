@@ -50,6 +50,8 @@ class Data(Base):
     value: Mapped[str] = mapped_column(init=False)
     job_id: Mapped[int] = mapped_column(ForeignKey("job.id"))
     job: Mapped["Job"] = relationship(back_populates="datas")
+    request_id: Mapped[int] = mapped_column(ForeignKey("request.id"), nullable=True)
+    request: Mapped["Request"] = relationship(back_populates="datas")
 
 
 class Job(Base):
