@@ -26,7 +26,7 @@ saga_operator_table = Table(
 class Saga(Base):
     __tablename__ = "saga"
 
-    name: Mapped[str] = mapped_column(init=False, primary_key=True)
+    name: Mapped[str] = mapped_column(primary_key=True)
     operators: Mapped[list["Operator"]] = relationship(
         secondary=saga_operator_table, back_populates="sagas"
     )
@@ -35,7 +35,7 @@ class Saga(Base):
 class Operator(Base):
     __tablename__ = "operator"
 
-    name: Mapped[str] = mapped_column(init=False, primary_key=True)
+    name: Mapped[str] = mapped_column(primary_key=True)
     sagas: Mapped[list[Saga]] = relationship(
         secondary=saga_operator_table, back_populates="operators"
     )
@@ -46,8 +46,8 @@ class Data(Base):
     __tablename__ = "data"
 
     id: Mapped[int] = mapped_column(init=False, primary_key=True)
-    key: Mapped[str] = mapped_column(init=False)
-    value: Mapped[str] = mapped_column(init=False)
+    key: Mapped[str] = mapped_column()
+    value: Mapped[str] = mapped_column()
     job_id: Mapped[int] = mapped_column(ForeignKey("job.id"))
     job: Mapped["Job"] = relationship(back_populates="datas")
     request_id: Mapped[int] = mapped_column(ForeignKey("request.id"), nullable=True)
@@ -93,7 +93,7 @@ class Input(Base):
     __tablename__ = "input"
 
     id: Mapped[int] = mapped_column(init=False, primary_key=True)
-    name: Mapped[str] = mapped_column(init=False)
+    name: Mapped[str] = mapped_column()
     request_id: Mapped[int] = mapped_column(ForeignKey("request.id"))
     request: Mapped[Request] = relationship(back_populates="inputs")
 
@@ -102,6 +102,6 @@ class Output(Base):
     __tablename__ = "output"
 
     id: Mapped[int] = mapped_column(init=False, primary_key=True)
-    name: Mapped[str] = mapped_column(init=False)
+    name: Mapped[str] = mapped_column()
     request_id: Mapped[int] = mapped_column(ForeignKey("request.id"))
     request: Mapped[Request] = relationship(back_populates="outputs")
