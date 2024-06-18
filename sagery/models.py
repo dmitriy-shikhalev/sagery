@@ -36,6 +36,9 @@ class Operator(Base):
     __tablename__ = "operator"
 
     name: Mapped[str] = mapped_column(primary_key=True)
+    inputs: Mapped[list["Input"]] = relationship(back_populates="operator")
+    outputs: Mapped[list["Output"]] = relationship(back_populates="operator")
+
     sagas: Mapped[list[Saga]] = relationship(
         secondary=saga_operator_table, back_populates="operators"
     )
@@ -46,12 +49,10 @@ class Data(Base):
     __tablename__ = "data"
 
     id: Mapped[int] = mapped_column(init=False, primary_key=True)
-    key: Mapped[str] = mapped_column()
+    key: Mapped[str] = mapped_column(index=True)
     value: Mapped[str] = mapped_column()
     job_id: Mapped[int] = mapped_column(ForeignKey("job.id"))
     job: Mapped["Job"] = relationship(back_populates="datas")
-    request_id: Mapped[int] = mapped_column(ForeignKey("request.id"), nullable=True)
-    request: Mapped["Request"] = relationship(back_populates="datas")
 
 
 class Job(Base):
@@ -63,18 +64,6 @@ class Job(Base):
     status: JobStatus = Column(Enum(JobStatus), default=JobStatus.PENDING)
 
 
-class JobOperatorData(Base):
-    __tablename__ = "job_operator_data"
-
-    id: Mapped[int] = mapped_column(init=False, primary_key=True)
-    job_id: Mapped[int] = mapped_column(ForeignKey("job.id"))
-    job: Mapped[Job] = relationship(back_populates="job_operator_datas")
-    operator_name: Mapped[int] = mapped_column(ForeignKey("operator.name"))
-    operator: Mapped[Operator] = relationship(back_populates="job_operator_datas")
-    data_id: Mapped[int] = mapped_column(ForeignKey("data.id"))
-    data: Mapped[Data] = relationship(back_populates="job_operator_datas")
-
-
 class Request(Base):
     __tablename__ = "request"
 
@@ -83,8 +72,7 @@ class Request(Base):
     job: Mapped["Job"] = relationship(back_populates="requests")
     operator_name: Mapped[str] = mapped_column(ForeignKey("operator.name"))
     operator: Mapped["Operator"] = relationship(back_populates="requests")
-    inputs: Mapped[list["Input"]] = relationship(back_populates="request")
-    outputs: Mapped[list["Output"]] = relationship(back_populates="request")
+
     external_id: Mapped[str] = mapped_column(nullable=True, default=None)
     status: RequestStatus = Column(Enum(RequestStatus), default=RequestStatus.PENDING)
 
@@ -93,15 +81,15 @@ class Input(Base):
     __tablename__ = "input"
 
     id: Mapped[int] = mapped_column(init=False, primary_key=True)
-    name: Mapped[str] = mapped_column()
-    request_id: Mapped[int] = mapped_column(ForeignKey("request.id"))
-    request: Mapped[Request] = relationship(back_populates="inputs")
+    name: Mapped[str] = mapped_column(index=True)
+    operator_name: Mapped[int] = mapped_column(ForeignKey("operator.name"))
+    operator: Mapped[Operator] = relationship(back_populates="inputs")
 
 
 class Output(Base):
     __tablename__ = "output"
 
     id: Mapped[int] = mapped_column(init=False, primary_key=True)
-    name: Mapped[str] = mapped_column()
-    request_id: Mapped[int] = mapped_column(ForeignKey("request.id"))
-    request: Mapped[Request] = relationship(back_populates="outputs")
+    name: Mapped[str] = mapped_column(index=True)
+    operator_name: Mapped[int] = mapped_column(ForeignKey("operator.name"))
+    operator: Mapped[Operator] = relationship(back_populates="outputs")
