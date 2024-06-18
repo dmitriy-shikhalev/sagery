@@ -2,13 +2,10 @@ from enum import Enum
 
 
 class JobStatus(Enum):
-    PENDING = 'PENDING'
-    BLOCKING = 'BLOCKING'
+    PENDING = 'NEW'
     RUNNING = 'RUNNING'
     DONE = 'DONE'
     FAILED = 'FAILED'
-    ROLLINGBACK = 'ROLLINGBACK'
-    ROLLEDBACK = 'ROLLEDBACK'
 
 
 class RequestStatus(Enum):
@@ -16,4 +13,3 @@ class RequestStatus(Enum):
     RUNNING = 'RUNNING'
     DONE = 'DONE'
     FAILED = 'FAILED'
-    CANCELLED = 'CANCELLED'
