@@ -1,3 +1,5 @@
+import enum
+
 from sqlalchemy import Column
 from sqlalchemy import Enum
 from sqlalchemy import Table
@@ -8,7 +10,12 @@ from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import MappedAsDataclass
 from sqlalchemy.orm import relationship
 
-from .status import JobStatus, RequestStatus
+
+class Status(enum.Enum):
+    PENDING = 'PENDING'
+    RUNNING = 'RUNNING'
+    DONE = 'DONE'
+    FAILED = 'FAILED'
 
 
 class Base(MappedAsDataclass, DeclarativeBase):
@@ -61,7 +68,7 @@ class Job(Base):
     id: Mapped[int] = mapped_column(init=False, primary_key=True)
     datas: Mapped[list[Data]] = relationship(back_populates="job")
     requests: Mapped[list["Request"]] = relationship(back_populates="job")
-    status: JobStatus = Column(Enum(JobStatus), default=JobStatus.PENDING)
+    status: Status = Column(Enum(Status), default=Status.PENDING, nullable=False)
 
 
 class Request(Base):
@@ -74,7 +81,7 @@ class Request(Base):
     operator: Mapped["Operator"] = relationship(back_populates="requests")
 
     external_id: Mapped[str] = mapped_column(nullable=True, default=None)
-    status: RequestStatus = Column(Enum(RequestStatus), default=RequestStatus.PENDING)
+    status: Status = Column(Enum(Status), default=Status.PENDING, nullable=False)
 
 
 class Input(Base):
