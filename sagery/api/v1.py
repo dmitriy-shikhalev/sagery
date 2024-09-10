@@ -3,7 +3,5 @@ from fastapi import FastAPI
 
 app = FastAPI(title='Sagery API')
 
+# todo: 3 commands - create, get status, get result
 
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
