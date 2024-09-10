@@ -1,11 +1,24 @@
 import logging
 
-import uvicorn
-
-from sagery.api.v1 import app
 
 logging.basicConfig(level=logging.INFO)
 
 
 def worker():
+    raise NotImplementedError
+
+
+def create_job():
+    raise NotImplementedError
+
+
+def get_status():
+    raise NotImplementedError
+
+
+def get_result():
+    raise NotImplementedError
+
+
+def main():
     raise NotImplementedError
