@@ -3,6 +3,8 @@ import asyncio
 import json
 import logging
 
+from sagery.settings import Settings
+
 
 logging.basicConfig(level=logging.INFO)
 
@@ -24,13 +26,16 @@ def get_result(id_: str):
 
 
 def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('action', type=str)
+    parser = argparse.ArgumentParser('sagery')
+    parser.add_argument('action', type=str, help='action')
     parser.add_argument('--args', type=str, default=None)
     parser.add_argument('--id', type=str, default=None)
 
     args = id_ = None
     arguments = parser.parse_args()
+
+    settings = Settings()
+
     if arguments.args is not None:
         args = json.loads(arguments.args)
     if arguments.id is not None:

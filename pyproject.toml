@@ -13,6 +13,7 @@ sqlalchemy = "^2.0.29"
 alembic = "^1.13.1"
 pydantic = "^2.9.1"
 
+pydantic-settings = "^2.4.0"
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.1.1"
 poetry = "^1.8.2"
