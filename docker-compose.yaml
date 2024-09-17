@@ -1,2 +1,24 @@
-db:
-  image: postgres
+services:
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRESDB_NAME: sagery
+      POSTGRES_USER: "${POSTGRES_USER:-sagery}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-sagery}"
+      POSTGRES_DB: "sagery"
+      POSTGRES_HOST: db
+      SQLALCHEMY_DATABASE_URI: "postgresql+asyncpg://{POSTGRES_USER:-sagery}:{POSTGRES_PASSWORD:-sagery}@db:5432/{POSTGRES_DB:-sagery}"
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER:-sagery} -d ${POSTGRES_DB:-sagery}'"]
+      interval: 5s
+      timeout: 60s
+      retries: 3
+      start_period: 10s
+      start_interval: 5s
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    ports:
+      - "5435:5432"
+
+volumes:
+  pg-data:
