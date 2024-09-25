@@ -12,7 +12,6 @@ python = "^3.12"
 sqlalchemy = "^2.0.29"
 alembic = "^1.13.1"
 pydantic = "^2.9.1"
-
 pydantic-settings = "^2.4.0"
 fastapi = "^0.114.0"
 uvicorn = "^0.30.6"
