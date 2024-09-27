@@ -1512,6 +1512,21 @@ files = [
 pytest-cover = "*"
 
 [[package]]
+name = "pytest-isort"
+version = "4.0.0"
+description = "py.test plugin to check import ordering using isort"
+optional = false
+python-versions = ">=3.8,<4"
+files = [
+    {file = "pytest_isort-4.0.0-py3-none-any.whl", hash = "sha256:14bb3281bab587d6beb53129481e8885232249ec5cfeaf5d903a561ff0589620"},
+    {file = "pytest_isort-4.0.0.tar.gz", hash = "sha256:00e99642e282b00b849cf9b49d9102a02ab8c4ec549ace57d7868b723713aaa9"},
+]
+
+[package.dependencies]
+isort = ">=4.0"
+pytest = ">=5.0"
+
+[[package]]
 name = "pytest-mypy"
 version = "0.10.3"
 description = "Mypy static type checker plugin for Pytest"
@@ -2013,4 +2028,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "09a4137a342e4baa534032c4232cf9a65c7798f63777fab643923104ea5ba99b"
+content-hash = "dce87ab69cf222035f6070c6e36e32a305ea52e19d5249c46815d6cf4bd9b880"
