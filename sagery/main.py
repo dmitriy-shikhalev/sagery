@@ -13,11 +13,10 @@ logging.basicConfig(level=logging.INFO)
 
 
 def main():
-    settings = Settings()
-
     args = argparse.ArgumentParser()
     args.add_argument("mode", help="mode", choices=Mode)
 
+    settings = Settings()
     match args.parse_args().mode:
         case Mode.WEB:
             uvicorn.run(app, host=settings.common.host, port=settings.common.port)
