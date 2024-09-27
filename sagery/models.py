@@ -44,7 +44,7 @@ class Item(Base):
     value: Mapped[str] = mapped_column(JSON(), nullable=False, default='null')
 
     __table_args__ = (
-        Index("items_key", 'job_id', "key"),
+        Index("ix_items_key", 'job_id', "key"),
     )
 
 
@@ -57,7 +57,7 @@ class Branch(Base):
     name: Mapped[str] = mapped_column(String(), nullable=False)
 
     __table_args__ = (
-        Index("branch_job_name_unique", 'job_id', "name", unique=True),
+        Index("uix_branch_job_name_unique", 'job_id', "name", unique=True),
     )
 
 
