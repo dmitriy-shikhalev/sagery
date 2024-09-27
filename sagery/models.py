@@ -24,12 +24,13 @@ class Base(MappedAsDataclass, DeclarativeBase):
     """subclasses will be converted to dataclasses"""
 
 
-RequestItemTable = Table(
-    'request_item',
+BranchItemTable = Table(
+    'branch_items',
     Base.metadata,
     Column("id", Integer, primary_key=True),
-    Column("request_id", Integer, ForeignKey("request.id")),
-    Column("item_id", Integer, ForeignKey("item.id")),
+    Column("num", Integer),  # Is num needed?
+    Column("branch_id", Integer, ForeignKey("branches.id")),
+    Column("item_id", Integer, ForeignKey("items.id")),
 )
 
 
@@ -37,13 +38,26 @@ class Item(Base):
     __tablename__ = "items"
 
     id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)
-    job_id: Mapped[int] = mapped_column(ForeignKey("job.id"), nullable=False, index=True)
+    job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id"), nullable=False, index=True)
     job: Mapped["Job"] = relationship(back_populates="items")
     key: Mapped[str] = mapped_column(nullable=False)
     value: Mapped[str] = mapped_column(JSON(), nullable=False, default='null')
 
     __table_args__ = (
         Index("items_key", 'job_id', "key"),
+    )
+
+
+class Branch(Base):
+    __tablename__ = "branches"
+
+    id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)
+    job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id"), nullable=False, index=True)
+    job: Mapped["Job"] = relationship(back_populates="items")
+    name: Mapped[str] = mapped_column(String(), nullable=False)
+
+    __table_args__ = (
+        Index("branch_job_name_unique", 'job_id', "name", unique=True),
     )
 
 
@@ -60,7 +74,7 @@ class Request(Base):
     __tablename__ = "requests"
 
     id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)
-    job_id: Mapped[int] = mapped_column(ForeignKey("job.id"), nullable=False, index=True)
+    job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id"), nullable=False, index=True)
     job: Mapped["Job"] = relationship(back_populates="requests")
 
     operator_name: Mapped[str] = Column(String(), nullable=False)
