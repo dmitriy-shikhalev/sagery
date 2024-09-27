@@ -53,8 +53,10 @@ class Branch(Base):
 
     id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)
     job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id"), nullable=False, index=True)
-    job: Mapped["Job"] = relationship(back_populates="items")
+    job: Mapped["Job"] = relationship(back_populates="branches")
     name: Mapped[str] = mapped_column(String(), nullable=False)
+
+    items: Mapped[list[Item]] = relationship("Item", secondary=BranchItemTable)
 
     __table_args__ = (
         Index("uix_branch_job_name_unique", 'job_id', "name", unique=True),
