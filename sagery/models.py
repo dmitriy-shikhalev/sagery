@@ -24,12 +24,12 @@ class Base(MappedAsDataclass, DeclarativeBase):
     """subclasses will be converted to dataclasses"""
 
 
-BranchItemTable = Table(
-    'branch_items',
+VarItemTable = Table(
+    'var_items',
     Base.metadata,
     Column("id", Integer, primary_key=True),
     Column("num", Integer),  # Is num needed?
-    Column("branch_id", Integer, ForeignKey("branches.id")),
+    Column("var_id", Integer, ForeignKey("vars.id")),
     Column("item_id", Integer, ForeignKey("items.id")),
 )
 
@@ -40,6 +40,7 @@ class Item(Base):
     id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)
     job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id"), nullable=False, index=True)
     job: Mapped["Job"] = relationship(back_populates="items")
+    index: Mapped[int] = mapped_column(Integer(), index=True, nullable=False)
     key: Mapped[str] = mapped_column(nullable=False)
     value: Mapped[str] = mapped_column(JSON(), nullable=False, default='null')
 
@@ -48,18 +49,18 @@ class Item(Base):
     )
 
 
-class Branch(Base):
-    __tablename__ = "branches"
+class Var(Base):
+    __tablename__ = "vars"
 
     id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)
     job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id"), nullable=False, index=True)
     job: Mapped["Job"] = relationship(back_populates="branches")
     name: Mapped[str] = mapped_column(String(), nullable=False)
 
-    items: Mapped[list[Item]] = relationship("Item", secondary=BranchItemTable)
+    items: Mapped[list[Item]] = relationship("Item", secondary=VarItemTable)
 
     __table_args__ = (
-        Index("uix_branch_job_name_unique", 'job_id', "name", unique=True),
+        Index("uix_job_var", 'job_id', "name", unique=True),
     )
 
 
