@@ -4,15 +4,17 @@ import logging
 import uvicorn
 
 from sagery.api import app
-from sagery.core import run
+from sagery.daemon import run
 from sagery.enums import Mode
 from sagery.settings import Settings
-
 
 logging.basicConfig(level=logging.INFO)
 
 
 def main():
+    """
+    Main function. Entry point for web and core.
+    """
     args = argparse.ArgumentParser()
     args.add_argument("mode", help="mode", choices=Mode)
 

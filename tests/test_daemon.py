@@ -1,4 +1,4 @@
-from sagery.core import run
+from sagery.daemon import run
 
 
 def test_run():
