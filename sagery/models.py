@@ -43,7 +43,7 @@ class Object(Base):
         Item,
         back_populates="object",
     )
-    request: Mapped["Request"] = relationship("Request", back_populates="objects")
+    request: Mapped["Request"] = relationship("Request", back_populates="object")
 
     status: Mapped[ObjectStatus] = mapped_column(
         ENUM(ObjectStatus),
@@ -73,6 +73,21 @@ class Var(Base):
     )
 
 
+class Request(Base):
+    """
+    Class for representing a request in the sagery database.
+    """
+    # pylint: disable=too-few-public-methods
+    __tablename__ = "requests"
+
+    id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)
+    object_id: Mapped[int] = mapped_column(ForeignKey("objects.id"), nullable=False, unique=True)
+    object: Mapped["Object"] = relationship(back_populates="request")
+
+    operator_name: Mapped[str] = mapped_column(String(), nullable=False, index=True)
+    status: Mapped[Status] = mapped_column(ENUM(Status), default=Status.PENDING, nullable=False, index=True)
+
+
 class Job(Base):
     # pylint: disable=too-few-public-methods
     """
@@ -83,19 +98,4 @@ class Job(Base):
     id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)
     vars: Mapped[list[Var]] = relationship(back_populates="job")
     requests: Mapped[list["Request"]] = relationship(back_populates="job")
-    status: Mapped[Status] = mapped_column(ENUM(Status), default=Status.PENDING, nullable=False, index=True)
-
-
-class Request(Base):
-    """
-    Class for representing a request in the sagery database.
-    """
-    # pylint: disable=too-few-public-methods
-    __tablename__ = "requests"
-
-    id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)
-    object_id: Mapped[int] = mapped_column(ForeignKey("objects.id"), nullable=False, index=True)
-    object: Mapped["Object"] = relationship(back_populates="request")
-
-    operator_name: Mapped[str] = mapped_column(String(), nullable=False, index=True)
     status: Mapped[Status] = mapped_column(ENUM(Status), default=Status.PENDING, nullable=False, index=True)
