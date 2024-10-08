@@ -1,11 +1,9 @@
-import enum
-
 from sqlalchemy import ForeignKey, Index, Integer, String
 from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.orm import (DeclarativeBase, Mapped, MappedAsDataclass,
                             mapped_column, relationship)
 
-from sagery.enums import VarStatus, Status, ObjectStatus
+from sagery.enums import ObjectStatus, Status, VarStatus
 
 
 class Base(MappedAsDataclass, DeclarativeBase):

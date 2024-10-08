@@ -1,15 +1,17 @@
-from sqlalchemy.orm import Session
+from typing import Generator
 
 from pytest import fixture
+from sqlalchemy.orm import Session
 
 from sagery.db import get_session
 
 
 @fixture()
-def session() -> Session:
-    with get_session() as session:
+def session() -> Generator[Session, None, None]:
+    # pylint: disable=missing-function-docstring, not-context-manager
+    with get_session() as _session:
         try:
-            yield session
+            yield _session
         finally:
-            session.rollback()
-            session.close()
+            _session.rollback()
+            _session.close()
