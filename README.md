@@ -24,3 +24,9 @@ alembic downgrade head
 ```shell
 alembic revision --autogenerate
 ```
+
+
+## Run debug web:
+```shell
+uvicorn sagery.api:app --reload
+```

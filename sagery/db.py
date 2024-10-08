@@ -11,7 +11,7 @@ def get_engine():
     settings = PostgresqlSettings()
     engine = create_engine(
         f"postgresql+psycopg2://{settings.user}:{settings.password}"
-        f"@{settings.host}:{settings.port}/{settings.database}/"
+        f"@{settings.host}:{settings.port}/{settings.db_name}/"
     )
     return engine
 
