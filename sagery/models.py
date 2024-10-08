@@ -1,19 +1,11 @@
 import enum
 
 from sqlalchemy import ForeignKey, Index, Integer, String
-from sqlalchemy.dialects.postgresql import ENUM, JSON
+from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.orm import (DeclarativeBase, Mapped, MappedAsDataclass,
                             mapped_column, relationship)
 
-
-class Status(enum.Enum):
-    """
-    All possible statuses.
-    """
-    PENDING = 'PENDING'
-    RUNNING = 'RUNNING'
-    DONE = 'DONE'
-    FAILED = 'FAILED'
+from sagery.enums import VarStatus, Status, ObjectStatus
 
 
 class Base(MappedAsDataclass, DeclarativeBase):
@@ -29,11 +21,36 @@ class Item(Base):
     __tablename__ = "items"
 
     id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)
+    object_id: Mapped[int] = mapped_column(ForeignKey("objects.id"), nullable=False, index=True)
+    object: Mapped["Object"] = relationship(back_populates="items")
+    key: Mapped[str] = mapped_column(nullable=False, index=True)
+    value: Mapped[str] = mapped_column(String(), nullable=False, default='null')
+
+
+class Object(Base):
+    # pylint: disable=too-few-public-methods
+    """
+    Class for representing an object in the sagery database.
+    """
+    __tablename__ = "objects"
+
+    id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)
     var_id: Mapped[int] = mapped_column(ForeignKey("vars.id"), nullable=False, index=True)
     var: Mapped["Var"] = relationship(back_populates="items")
     index: Mapped[int] = mapped_column(Integer(), nullable=False, index=True)
-    key: Mapped[str] = mapped_column(nullable=False, index=True)
-    value: Mapped[str] = mapped_column(JSON(), nullable=False, default='null')
+
+    items: Mapped[list[Item]] = relationship(
+        Item,
+        back_populates="object",
+    )
+    request: Mapped["Request"] = relationship("Request", back_populates="objects")
+
+    status: Mapped[ObjectStatus] = mapped_column(
+        ENUM(ObjectStatus),
+        default=ObjectStatus.NONE,
+        nullable=False,
+        index=True
+    )
 
 
 class Var(Base):
@@ -48,8 +65,8 @@ class Var(Base):
     job: Mapped["Job"] = relationship(back_populates="branches")
     name: Mapped[str] = mapped_column(String(), nullable=False)
 
-    items: Mapped[list[Item]] = relationship(Item, back_populates="var")
-    requests: Mapped[list["Request"]] = relationship("Request", back_populates="var")
+    objects: Mapped[list[Object]] = relationship(Object, back_populates="var")
+    status: Mapped[VarStatus] = mapped_column(ENUM(VarStatus), default=VarStatus.STARTED, nullable=False, index=True)
 
     __table_args__ = (
         Index("uix_job_var", 'job_id', "name", unique=True),
@@ -77,11 +94,8 @@ class Request(Base):
     __tablename__ = "requests"
 
     id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)
-    job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id"), nullable=False, index=True)
-    job: Mapped["Job"] = relationship(back_populates="requests")
-    var_id: Mapped[int] = mapped_column(ForeignKey("vars.id"), nullable=False, index=True)
-    var: Mapped["Var"] = relationship(back_populates="requests")
+    object_id: Mapped[int] = mapped_column(ForeignKey("objects.id"), nullable=False, index=True)
+    object: Mapped["Object"] = relationship(back_populates="request")
 
-    index: Mapped[int] = mapped_column(Integer(), nullable=False, index=True)
     operator_name: Mapped[str] = mapped_column(String(), nullable=False, index=True)
     status: Mapped[Status] = mapped_column(ENUM(Status), default=Status.PENDING, nullable=False, index=True)

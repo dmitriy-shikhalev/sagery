@@ -1,3 +1,0 @@
-class Type:
-    ...
-# todo: write system of typing and type validation
