@@ -19,8 +19,8 @@ class Item(Base):
     __tablename__ = "items"
 
     id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)
-    object_id: Mapped[int] = mapped_column(ForeignKey("objects.id"), nullable=False, index=True)
-    object: Mapped["Object"] = relationship(back_populates="items")
+    object_id: Mapped[int] = mapped_column(ForeignKey("objects.id", ondelete='CASCADE'), nullable=False, index=True)
+    object: Mapped["Object"] = relationship(back_populates="items", passive_deletes=True)
     key: Mapped[str] = mapped_column(nullable=False, index=True)
     value: Mapped[str] = mapped_column(String(), nullable=False, default='null')
 
@@ -33,8 +33,8 @@ class Object(Base):
     __tablename__ = "objects"
 
     id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)
-    var_id: Mapped[int] = mapped_column(ForeignKey("vars.id"), nullable=False, index=True)
-    var: Mapped["Var"] = relationship(back_populates="items")
+    var_id: Mapped[int] = mapped_column(ForeignKey("vars.id", ondelete='CASCADE'), nullable=False, index=True)
+    var: Mapped["Var"] = relationship(back_populates="items", passive_deletes=True)
     index: Mapped[int] = mapped_column(Integer(), nullable=False, index=True)
 
     items: Mapped[list[Item]] = relationship(
@@ -59,8 +59,8 @@ class Var(Base):
     __tablename__ = "vars"
 
     id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)
-    job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id"), nullable=False, index=True)
-    job: Mapped["Job"] = relationship(back_populates="branches")
+    job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id", ondelete='CASCADE'), nullable=False, index=True)
+    job: Mapped["Job"] = relationship(back_populates="vars", passive_deletes=True)
     name: Mapped[str] = mapped_column(String(), nullable=False)
 
     objects: Mapped[list[Object]] = relationship(Object, back_populates="var")
@@ -79,8 +79,8 @@ class Request(Base):
     __tablename__ = "requests"
 
     id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)
-    object_id: Mapped[int] = mapped_column(ForeignKey("objects.id"), nullable=False, unique=True)
-    object: Mapped["Object"] = relationship(back_populates="request")
+    object_id: Mapped[int] = mapped_column(ForeignKey("objects.id", ondelete='CASCADE'), nullable=False, unique=True)
+    object: Mapped["Object"] = relationship(back_populates="request", passive_deletes=True)
 
     operator_name: Mapped[str] = mapped_column(String(), nullable=False, index=True)
     status: Mapped[Status] = mapped_column(ENUM(Status), default=Status.PENDING, nullable=False, index=True)

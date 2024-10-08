@@ -4,5 +4,8 @@ from pydantic import BaseModel
 
 
 class AbstractJob(ABC):
-    # pylint: disable=missing-class-docstring
-    pass
+    """
+    Abstract base class for jobs.
+    """
+    def __init__(self, job_id: int):
+        self.job_id = job_id

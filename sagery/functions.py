@@ -2,10 +2,16 @@ from abc import ABC, abstractmethod
 
 
 class AbstractFunction(ABC):
-    # pylint: disable=missing-class-docstring
-    # TODO: resolve, if descriptor here or just a function?
+    # pylint: disable=too-few-public-methods
+    """
+    Abstract base class for all functions.
+    """
+    def __init__(self, *vars_: str, **kwargs):
+        self.vars = vars_
+        self.kwargs = kwargs
+
     @abstractmethod
-    def run(self):
+    async def run(self):
         """
         Run the function for execution.
         """

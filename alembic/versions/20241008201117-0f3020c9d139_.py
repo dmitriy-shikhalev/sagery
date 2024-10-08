@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 4ecb64304fa4
+Revision ID: 0f3020c9d139
 Revises: 
-Create Date: 2024-10-08 13:54:36.726005
+Create Date: 2024-10-08 20:11:17.789140
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = '4ecb64304fa4'
+revision: str = '0f3020c9d139'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -35,7 +35,7 @@ def upgrade() -> None:
     sa.Column('job_id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('status', postgresql.ENUM('STARTED', 'CLOSED', name='varstatus'), nullable=False),
-    sa.ForeignKeyConstraint(['job_id'], ['jobs.id'], ),
+    sa.ForeignKeyConstraint(['job_id'], ['jobs.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_vars_job_id'), 'vars', ['job_id'], unique=False)
@@ -46,7 +46,7 @@ def upgrade() -> None:
     sa.Column('var_id', sa.Integer(), nullable=False),
     sa.Column('index', sa.Integer(), nullable=False),
     sa.Column('status', postgresql.ENUM('NONE', 'USED', name='objectstatus'), nullable=False),
-    sa.ForeignKeyConstraint(['var_id'], ['vars.id'], ),
+    sa.ForeignKeyConstraint(['var_id'], ['vars.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_objects_index'), 'objects', ['index'], unique=False)
@@ -57,7 +57,7 @@ def upgrade() -> None:
     sa.Column('object_id', sa.Integer(), nullable=False),
     sa.Column('key', sa.String(), nullable=False),
     sa.Column('value', sa.String(), nullable=False),
-    sa.ForeignKeyConstraint(['object_id'], ['objects.id'], ),
+    sa.ForeignKeyConstraint(['object_id'], ['objects.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_items_key'), 'items', ['key'], unique=False)
@@ -67,7 +67,7 @@ def upgrade() -> None:
     sa.Column('object_id', sa.Integer(), nullable=False),
     sa.Column('operator_name', sa.String(), nullable=False),
     sa.Column('status', postgresql.ENUM('PENDING', 'RUNNING', 'DONE', 'FAILED', name='status'), nullable=False),
-    sa.ForeignKeyConstraint(['object_id'], ['objects.id'], ),
+    sa.ForeignKeyConstraint(['object_id'], ['objects.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('object_id')
     )
