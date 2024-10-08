@@ -1,14 +1,16 @@
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI  # , HTTPException
 from sqlalchemy.orm import Session
 
 from sagery.db import get_session
+# from sagery.models import Job
 from sagery.schema import Var
 
 app = FastAPI(title='Sagery API')
 
 
 @app.post('/jobs/')
-async def create_job(var: Var, session: Session = Depends(get_session)):
+async def create_job(name: str, input: Var, session: Session = Depends(get_session)):
+    # pylint: disable=redefined-builtin
     """
     API endpoint for creating jobs.
     """

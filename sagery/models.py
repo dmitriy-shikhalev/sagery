@@ -94,6 +94,7 @@ class Job(Base):
     __tablename__ = "jobs"
 
     id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)
+    name: Mapped[str] = mapped_column(String(), nullable=False, index=True)
     vars: Mapped[list[Var]] = relationship(back_populates="job")
-    requests: Mapped[list["Request"]] = relationship(back_populates="job")
+    requests: Mapped[list[Request]] = relationship(back_populates="job")
     status: Mapped[Status] = mapped_column(ENUM(Status), default=Status.PENDING, nullable=False, index=True)
