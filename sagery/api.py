@@ -2,7 +2,6 @@ from fastapi import Depends, FastAPI  # , HTTPException
 from sqlalchemy.orm import Session
 
 from sagery.db import get_session
-# from sagery.models import Job
 from sagery.schema import Var
 
 app = FastAPI(title='Sagery API')
