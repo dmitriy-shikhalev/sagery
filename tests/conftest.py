@@ -1,17 +1,28 @@
-from typing import Generator
+from typing import AsyncGenerator, Generator
 
 from pytest import fixture
 from sqlalchemy.orm import Session
 
 from sagery.db import get_session
+from sagery.models import Job
+from sagery.repositories import JobRepository
 
 
 @fixture()
-def session() -> Generator[Session, None, None]:
+def test_session() -> Generator[Session, None, None]:
     # pylint: disable=missing-function-docstring, not-context-manager
-    with get_session() as _session:
+    with get_session() as session:
         try:
-            yield _session
+            yield session
         finally:
-            _session.rollback()
-            _session.close()
+            session.rollback()
+            session.close()
+
+
+@fixture()
+async def job(test_session: Session) -> AsyncGenerator[Job, None]:  # pylint: disable=redefined-outer-name
+    """
+    Job fixture.
+    """
+    job_ = await JobRepository(test_session).create(a='b')
+    yield job_

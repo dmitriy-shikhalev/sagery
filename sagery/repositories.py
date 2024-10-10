@@ -18,18 +18,18 @@ class AbstractRepository(ABC):
         """
         Property, that contains sqlalchemy model.
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def __init__(self, session: Session) -> None:
         self.session = session
 
-    async def create(self, **kwargs: Any) -> int:
+    async def create(self, **kwargs: Any) -> Job:
         """
         Common method to create a new row in database of self.model.
         """
         statement = insert(self.model).values(**kwargs)
         result = self.session.execute(statement)
-        return result.returns_rows[0].id
+        return result.returns_rows[0]
 
     async def get(self, id: int) -> Any:  # pylint: disable=redefined-builtin
         """

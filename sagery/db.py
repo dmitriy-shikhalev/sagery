@@ -1,3 +1,5 @@
+from contextlib import contextmanager
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
@@ -11,11 +13,12 @@ def get_engine():
     settings = PostgresqlSettings()
     engine = create_engine(
         f"postgresql+psycopg2://{settings.user}:{settings.password}"
-        f"@{settings.host}:{settings.port}/{settings.db_name}/"
+        f"@{settings.host}:{settings.port}/{settings.db_name}"
     )
     return engine
 
 
+@contextmanager
 def get_session():
     """
     Return a sqlalchemy session instance.
