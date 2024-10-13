@@ -1,13 +1,28 @@
 from sagery.repositories import JobRepository
 
 
-async def test_job_create(test_session):
+async def test_job_create_with_search(test_session):
     """
     Test of JobRepository class, method "create".
     """
     job_repository = JobRepository(test_session)
-    job_id = await job_repository.create(a='b')
+    job = await job_repository.create(name='test name')
 
-    read_job = await job_repository.search(id=job_id)
+    read_jobs = await job_repository.search(id=job.id)
 
-    assert read_job.a == 'b'
+    assert len(read_jobs) == 1
+    assert read_jobs[0].name == 'test name'
+    assert read_jobs[0].status.value == 'PENDING'
+
+
+async def test_job_create_with_get(test_session):
+    """
+    Test of JobRepository class, method "create".
+    """
+    job_repository = JobRepository(test_session)
+    job = await job_repository.create(name='test name')
+
+    read_job = await job_repository.get(job.id)
+
+    assert read_job.name == 'test name'
+    assert read_job.status.value == 'PENDING'

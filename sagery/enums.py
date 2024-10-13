@@ -32,5 +32,5 @@ class VarStatus(Enum):
     """
     All possible Var statuses.
     """
-    STARTED = 'OPEN'
+    OPEN = 'OPEN'
     CLOSED = 'CLOSED'

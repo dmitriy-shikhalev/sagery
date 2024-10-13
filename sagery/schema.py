@@ -1,4 +1,4 @@
-from pydantic import RootModel
+from pydantic import BaseModel, RootModel
 
 
 class Object(RootModel):
@@ -8,8 +8,9 @@ class Object(RootModel):
     root: dict[str, str]
 
 
-class Var(RootModel):
+class Var(BaseModel):
     """
     Model for representing var.
     """
-    root: list[Object]
+    data: list[Object]
+    closed: bool

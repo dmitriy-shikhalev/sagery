@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
+from itertools import chain
 from typing import Any
 
-from sqlalchemy import insert
+from sqlalchemy import insert, select, update
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.selectable import TableClause
 
@@ -27,21 +28,25 @@ class AbstractRepository(ABC):
         """
         Common method to create a new row in database of self.model.
         """
-        statement = insert(self.model).values(**kwargs)
+        statement = insert(self.model).values(**kwargs).returning(self.model)
         result = self.session.execute(statement)
-        return result.returns_rows[0]
+        return result.scalar()
 
     async def get(self, id: int) -> Any:  # pylint: disable=redefined-builtin
         """
         Common method to get a row in database of self.model.
         """
-        raise NotImplementedError
+        statement = select(self.model).filter(self.model.id == id)
+        result = self.session.execute(statement)
+        return result.scalar()
 
     async def search(self, **kwargs: Any) -> list[Any]:
         """
         Common method to search rows in database of self.model.
         """
-        raise NotImplementedError
+        statement = select(self.model).filter_by(**kwargs)
+        result = self.session.execute(statement)
+        return result.scalars().fetchall()  # type: ignore
 
 
 class JobRepository(AbstractRepository):

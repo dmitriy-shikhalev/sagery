@@ -34,7 +34,7 @@ class Object(Base):
 
     id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)
     var_id: Mapped[int] = mapped_column(ForeignKey("vars.id", ondelete='CASCADE'), nullable=False, index=True)
-    var: Mapped["Var"] = relationship(back_populates="items", passive_deletes=True)
+    var: Mapped["Var"] = relationship(back_populates="objects", passive_deletes=True)
     index: Mapped[int] = mapped_column(Integer(), nullable=False, index=True)
 
     items: Mapped[list[Item]] = relationship(
@@ -64,7 +64,7 @@ class Var(Base):
     name: Mapped[str] = mapped_column(String(), nullable=False)
 
     objects: Mapped[list[Object]] = relationship(Object, back_populates="var")
-    status: Mapped[VarStatus] = mapped_column(ENUM(VarStatus), default=VarStatus.STARTED, nullable=False, index=True)
+    status: Mapped[VarStatus] = mapped_column(ENUM(VarStatus), default=VarStatus.OPEN, nullable=False, index=True)
 
     __table_args__ = (
         Index("uix_job_var", 'job_id', "name", unique=True),
@@ -96,5 +96,9 @@ class Job(Base):
     id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)
     name: Mapped[str] = mapped_column(String(), nullable=False, index=True)
     vars: Mapped[list[Var]] = relationship(back_populates="job")
-    requests: Mapped[list[Request]] = relationship(back_populates="job")
+    # requests: Mapped[list[Request]] = relationship(
+    #     back_populates="job",
+    #     primaryjoin='and_(Job.id==Var.job_id, Object.var_id==Var.id, Object.id==Request.object_id)',
+    #     viewonly=True,
+    # )
     status: Mapped[Status] = mapped_column(ENUM(Status), default=Status.PENDING, nullable=False, index=True)
