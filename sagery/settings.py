@@ -23,6 +23,8 @@ class CommonSettings(BaseSettings):
 
     host: str = 'localhost'
     port: int = 8000
+    jobs_list_filename: str = 'jobs_list.json'
+    operators_list_filename: str = 'operators_list.json'
 
 
 class Settings(BaseSettings):

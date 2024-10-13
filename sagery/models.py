@@ -64,6 +64,8 @@ class Var(Base):
     name: Mapped[str] = mapped_column(String(), nullable=False)
 
     objects: Mapped[list[Object]] = relationship(Object, back_populates="var")
+
+    accounted: Mapped[bool] = mapped_column(nullable=False, default=True)
     status: Mapped[VarStatus] = mapped_column(ENUM(VarStatus), default=VarStatus.OPEN, nullable=False, index=True)
 
     __table_args__ = (
@@ -96,7 +98,7 @@ class Job(Base):
     id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)
     name: Mapped[str] = mapped_column(String(), nullable=False, index=True)
     vars: Mapped[list[Var]] = relationship(back_populates="job")
-    # requests: Mapped[list[Request]] = relationship(
+    # requests: Mapped[list[Request]] = relationship(  todo: fix it
     #     back_populates="job",
     #     primaryjoin='and_(Job.id==Var.job_id, Object.var_id==Var.id, Object.id==Request.object_id)',
     #     viewonly=True,

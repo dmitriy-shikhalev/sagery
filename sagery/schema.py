@@ -1,16 +1,20 @@
-from pydantic import BaseModel, RootModel
+from pydantic import BaseModel
+
+from sagery.enums import VarStatus
 
 
-class Object(RootModel):
+class Object(BaseModel):
     """
-    Model for representing object.
+    Model for representing an object.
     """
-    root: dict[str, str]
+    data: dict[str, str]
+    index: int
 
 
 class Var(BaseModel):
     """
-    Model for representing var.
+    Model for representing a var.
     """
     data: list[Object]
-    closed: bool
+    accounted: bool
+    status: VarStatus

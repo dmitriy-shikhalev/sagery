@@ -36,6 +36,7 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('job_id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(), nullable=False),
+    sa.Column('accounted', sa.Boolean(), nullable=False, default=True),
     sa.Column('status', postgresql.ENUM('STARTED', 'CLOSED', name='varstatus'), nullable=False),
     sa.ForeignKeyConstraint(['job_id'], ['jobs.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')

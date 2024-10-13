@@ -1,12 +1,11 @@
 from abc import ABC, abstractmethod
-from itertools import chain
 from typing import Any
 
-from sqlalchemy import insert, select, update
+from sqlalchemy import insert, select
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.selectable import TableClause
 
-from sagery.models import Job
+from sagery.models import Item, Job, Object, Request, Var
 
 
 class AbstractRepository(ABC):
@@ -36,7 +35,7 @@ class AbstractRepository(ABC):
         """
         Common method to get a row in database of self.model.
         """
-        statement = select(self.model).filter(self.model.id == id)
+        statement = select(self.model).filter(self.model.id == id)  # type: ignore[attr-defined]
         result = self.session.execute(statement)
         return result.scalar()
 
@@ -54,3 +53,31 @@ class JobRepository(AbstractRepository):
     Class for repository for Jobs.
     """
     model = Job  # type: ignore
+
+
+class VarRepository(AbstractRepository):
+    """
+    Class for repository for Vars.
+    """
+    model = Var  # type: ignore
+
+
+class ObjectRepository(AbstractRepository):
+    """
+    Class for repository for Objects.
+    """
+    model = Object  # type: ignore
+
+
+class ItemRepository(AbstractRepository):
+    """
+    Class for repository for Items.
+    """
+    model = Item  # type: ignore
+
+
+class RequestRepository(AbstractRepository):
+    """
+    Class for repository for Requests.
+    """
+    model = Request  # type: ignore
