@@ -7,6 +7,7 @@ class Thread:
     # pylint: disable=missing-class-docstring
     name: str
     accounted: bool
+    managed: bool
 
 
 class AbstractSaga(ABC):
