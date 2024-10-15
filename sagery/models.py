@@ -3,7 +3,7 @@ from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.orm import (DeclarativeBase, Mapped, MappedAsDataclass,
                             mapped_column, relationship)
 
-from sagery.enums import ObjectStatus, Status, VarStatus
+from sagery.enums import ObjectStatus, Status, ThreadStatus
 
 
 class Base(MappedAsDataclass, DeclarativeBase):
@@ -33,16 +33,15 @@ class Object(Base):
     __tablename__ = "objects"
 
     id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)
-    var_id: Mapped[int] = mapped_column(ForeignKey("vars.id", ondelete='CASCADE'), nullable=False, index=True)
-    var: Mapped["Var"] = relationship(back_populates="objects", passive_deletes=True)
-    index: Mapped[int] = mapped_column(Integer(), nullable=False, index=True)
+    thread_id: Mapped[int] = mapped_column(ForeignKey("threads.id", ondelete='CASCADE'), nullable=False)
+    thread: Mapped["Thread"] = relationship(back_populates="objects", passive_deletes=True)
+    index: Mapped[int] = mapped_column(Integer(), nullable=False)
 
     items: Mapped[list[Item]] = relationship(
         Item,
         back_populates="object",
     )
     request: Mapped["Request"] = relationship("Request", back_populates="object")
-
     status: Mapped[ObjectStatus] = mapped_column(
         ENUM(ObjectStatus),
         default=ObjectStatus.NONE,
@@ -50,26 +49,35 @@ class Object(Base):
         index=True
     )
 
+    __table_args__ = (
+        Index("uix_objects", 'thread_id', "index", unique=True),
+    )
 
-class Var(Base):
+
+class Thread(Base):
     # pylint: disable=too-few-public-methods
     """
-    Class for representing a variable in the sagery database.
+    Class for representing a thread in the sagery database.
     """
-    __tablename__ = "vars"
+    __tablename__ = "threads"
 
     id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)
     job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id", ondelete='CASCADE'), nullable=False, index=True)
-    job: Mapped["Job"] = relationship(back_populates="vars", passive_deletes=True)
+    job: Mapped["Job"] = relationship(back_populates="threads", passive_deletes=True)
     name: Mapped[str] = mapped_column(String(), nullable=False)
 
-    objects: Mapped[list[Object]] = relationship(Object, back_populates="var")
+    objects: Mapped[list[Object]] = relationship(Object, back_populates="thread")
 
     accounted: Mapped[bool] = mapped_column(nullable=False, default=True)
-    status: Mapped[VarStatus] = mapped_column(ENUM(VarStatus), default=VarStatus.OPEN, nullable=False, index=True)
+    status: Mapped[ThreadStatus] = mapped_column(
+        ENUM(ThreadStatus),
+        default=ThreadStatus.OPEN,
+        nullable=False,
+        index=True
+    )
 
     __table_args__ = (
-        Index("uix_job_var", 'job_id', "name", unique=True),
+        Index("uix_job_thread", 'job_id', "name", unique=True),
     )
 
 
@@ -97,10 +105,10 @@ class Job(Base):
 
     id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)
     name: Mapped[str] = mapped_column(String(), nullable=False, index=True)
-    vars: Mapped[list[Var]] = relationship(back_populates="job")
+    threads: Mapped[list[Thread]] = relationship(back_populates="job")
     # requests: Mapped[list[Request]] = relationship(  todo: fix it
     #     back_populates="job",
-    #     primaryjoin='and_(Job.id==Var.job_id, Object.var_id==Var.id, Object.id==Request.object_id)',
+    #     primaryjoin='and_(Job.id==Thread.job_id, Object.thread_id==Thread.id, Object.id==Request.object_id)',
     #     viewonly=True,
     # )
     status: Mapped[Status] = mapped_column(ENUM(Status), default=Status.PENDING, nullable=False, index=True)

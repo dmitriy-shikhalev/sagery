@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from sagery.enums import VarStatus
+from sagery.enums import ThreadStatus
 
 
 class Object(BaseModel):
@@ -11,10 +11,10 @@ class Object(BaseModel):
     index: int
 
 
-class Var(BaseModel):
+class Thread(BaseModel):
     """
     Model for representing a var.
     """
     data: list[Object]
     accounted: bool
-    status: VarStatus
+    status: ThreadStatus

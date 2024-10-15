@@ -28,9 +28,9 @@ class ObjectStatus(Enum):
     USED = 'USED'
 
 
-class VarStatus(Enum):
+class ThreadStatus(Enum):
     """
-    All possible Var statuses.
+    All possible Thread statuses.
     """
     OPEN = 'OPEN'
     CLOSED = 'CLOSED'

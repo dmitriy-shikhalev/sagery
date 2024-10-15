@@ -1,9 +1,11 @@
 from typing import AsyncGenerator, Generator
+from unittest.mock import Mock
 
 from pytest import fixture
 from sqlalchemy.orm import Session
 
 from sagery.db import get_session
+from sagery.main import app
 from sagery.models import Job
 from sagery.repositories import JobRepository
 
@@ -11,12 +13,32 @@ from sagery.repositories import JobRepository
 @fixture()
 def test_session() -> Generator[Session, None, None]:
     # pylint: disable=missing-function-docstring, not-context-manager
-    with get_session() as session:
-        try:
-            yield session
-        finally:
-            session.rollback()
-            session.close()
+    session = next(get_session(), None)
+    if session is None:
+        raise RuntimeError('Session is None!')
+
+    try:
+        yield session
+    finally:
+        session.rollback()
+        session.close()
+
+
+@fixture()
+def session_override():
+    """
+    Override the DB session.
+    """
+    session_mock = Mock()
+
+    def get_session_override():
+        return session_mock
+
+    app.dependency_overrides[get_session] = get_session_override
+    try:
+        yield session_mock
+    finally:
+        app.dependency_overrides.clear()
 
 
 @fixture()

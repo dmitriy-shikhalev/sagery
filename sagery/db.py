@@ -1,4 +1,4 @@
-from contextlib import contextmanager
+from typing import Generator
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
@@ -18,8 +18,7 @@ def get_engine():
     return engine
 
 
-@contextmanager
-def get_session():
+def get_session() -> Generator[Session, None, None]:
     """
     Return a sqlalchemy session instance.
     """

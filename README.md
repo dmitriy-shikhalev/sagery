@@ -7,7 +7,7 @@
 ```python
 op.execute('DROP TYPE IF EXISTS Status')
 op.execute('DROP TYPE IF EXISTS ObjectStatus')
-op.execute('DROP TYPE IF EXISTS VarStatus')
+op.execute('DROP TYPE IF EXISTS ThreadStatus')
 ```
 
 ## Downgrade to previous migration:

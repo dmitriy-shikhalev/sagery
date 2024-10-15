@@ -1,3 +1,6 @@
+from sagery.sagas import AbstractSaga
+
+
 class _Registry:
     def __init__(self):
         self._registry = {}
@@ -8,15 +11,15 @@ class _Registry:
         """
         self._registry[name] = klass
 
-    def get(self, name: str):
+    def get(self, name: str) -> AbstractSaga:
         """
         Get a class by name.
         """
         return self._registry.get(name)
 
 
-job_registry = _Registry()
-operator_registry = _Registry()
+SAGA_REGISTRY = _Registry()
+OPERATOR_REGISTRY = _Registry()
 
 
 def collect_all(jobs: list[str], operators: list[str]):

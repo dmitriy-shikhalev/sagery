@@ -3,23 +3,30 @@ from sqlalchemy.orm import Session
 
 from sagery.db import get_session
 from sagery.models import Job
-from sagery.registry import job_registry
-from sagery.repositories import JobRepository
+from sagery.registry import SAGA_REGISTRY
+from sagery.repositories import JobRepository, ThreadRepository
 
 app = FastAPI(title='Sagery API')
 
 
-@app.post('/jobs/{name}/', response_model=int, status_code=201)
+@app.post('/sagas/{name}/', response_model=int, status_code=201)
 async def create_job(name: str, session: Session = Depends(get_session)):
     # pylint: disable=redefined-builtin
     """
     API endpoint for creating jobs.
     """
-    if job_registry.get(name) is None:
-        raise HTTPException(status_code=404, detail=f'Job {name} not found')
+    saga = SAGA_REGISTRY.get(name)
+    if saga is None:
+        raise HTTPException(status_code=404, detail=f'Saga {name} not found')
 
     job_repository = JobRepository(session)
+    thread_repository = ThreadRepository(session)
+
     job: Job = await job_repository.create(name=name)
+    for thread in saga.thread_list:
+        await thread_repository.create(job_id=job.id, name=thread.name, accounted=thread.accounted)
+
+    session.commit()
     return job.id
 
 
@@ -31,49 +38,54 @@ async def get_job(job_id: int, session: Session = Depends(get_session)):
     raise NotImplementedError
 
 
-@app.get('/jobs/{job_id:int}/vars/')
-async def get_var_list(job_id: int, session: Session = Depends(get_session)):
+@app.get('/jobs/{job_id:int}/threads/')
+async def get_thread_list(job_id: int, session: Session = Depends(get_session)):
     """
-    API endpoint for getting vars for job.
-    """
-    raise NotImplementedError
-
-
-@app.post('/jobs/{job_id:int}/vars/{var_name:str}/set-closed/')
-async def set_var_closed(job_id: int, var_name: str, session: Session = Depends(get_session)):
-    """
-    API endpoint for setting the closed var for job.
+    API endpoint for getting threads for job.
     """
     raise NotImplementedError
 
 
-@app.get('/jobs/{job_id:int}/vars/{var_name:str}/')
-async def get_one_var(job_id: int, var_name: str, session: Session = Depends(get_session)):
+@app.post('/jobs/{job_id:int}/threads/{thread_name:str}/set-closed/')
+async def set_thread_closed(job_id: int, thread_name: str, session: Session = Depends(get_session)):
     """
-    API endpoint for getting one var for job by var name.
-    """
-    raise NotImplementedError
-
-
-@app.post('/jobs/{job_id:int}/vars/{var_name}/objects/')
-async def add_object(job_id: int, var_name: str, session: Session = Depends(get_session)):
-    """
-    API endpoint for adding object to var.
+    API endpoint for setting the closed thread for job.
     """
     raise NotImplementedError
 
 
-@app.get('/jobs/{job_id:int}/vars/{var_name}/objects/')
-async def get_object_list(job_id: int, var_name: str, session: Session = Depends(get_session)):
+@app.get('/jobs/{job_id:int}/threads/{thread_name:str}/')
+async def get_one_thread(job_id: int, thread_name: str, session: Session = Depends(get_session)):
     """
-    API endpoint for adding object to var.
+    API endpoint for getting one thread for job by thread name.
     """
     raise NotImplementedError
 
 
-@app.get('/jobs/{job_id:int}/vars/{var_name}/objects/{index:int}/')
-async def get_one_object(job_id: int, var_name: str, index: int, session: Session = Depends(get_session)):
+@app.post('/jobs/{job_id:int}/threads/{thread_name}/objects/')
+async def add_object(
+        job_id: int,
+        thread_name: str,
+        object_data: dict[str, str],
+        session: Session = Depends(get_session)
+):
     """
-    API endpoint for adding object to var.
+    API endpoint for adding object to thread.
+    """
+    raise NotImplementedError
+
+
+@app.get('/jobs/{job_id:int}/threads/{thread_name}/objects/')
+async def get_object_list(job_id: int, thread_name: str, session: Session = Depends(get_session)):
+    """
+    API endpoint for adding object to thread.
+    """
+    raise NotImplementedError
+
+
+@app.get('/jobs/{job_id:int}/threads/{thread_name}/objects/{index:int}/')
+async def get_one_object(job_id: int, thread_name: str, index: int, session: Session = Depends(get_session)):
+    """
+    API endpoint for adding object to thread.
     """
     raise NotImplementedError

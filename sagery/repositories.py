@@ -5,7 +5,7 @@ from sqlalchemy import insert, select
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.selectable import TableClause
 
-from sagery.models import Item, Job, Object, Request, Var
+from sagery.models import Item, Job, Object, Request, Thread
 
 
 class AbstractRepository(ABC):
@@ -55,11 +55,11 @@ class JobRepository(AbstractRepository):
     model = Job  # type: ignore
 
 
-class VarRepository(AbstractRepository):
+class ThreadRepository(AbstractRepository):
     """
     Class for repository for Vars.
     """
-    model = Var  # type: ignore
+    model = Thread  # type: ignore
 
 
 class ObjectRepository(AbstractRepository):
