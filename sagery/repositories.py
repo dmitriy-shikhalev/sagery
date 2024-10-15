@@ -39,9 +39,9 @@ class AbstractRepository(ABC):
         result = self.session.execute(statement)
         return result.scalar()
 
-    async def search(self, **kwargs: Any) -> list[Any]:
+    async def filter_by(self, **kwargs: Any) -> list[Any]:
         """
-        Common method to search rows in database of self.model.
+        Common method to search rows in database of self.model by fields.
         """
         statement = select(self.model).filter_by(**kwargs)
         result = self.session.execute(statement)
