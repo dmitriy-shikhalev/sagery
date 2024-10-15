@@ -65,10 +65,11 @@ class Thread(Base):
     job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id", ondelete='CASCADE'), nullable=False, index=True)
     job: Mapped["Job"] = relationship(back_populates="threads", passive_deletes=True)
     name: Mapped[str] = mapped_column(String(), nullable=False)
+    accounted: Mapped[bool] = mapped_column(nullable=False)
+    managed: Mapped[bool] = mapped_column(nullable=False)
 
     objects: Mapped[list[Object]] = relationship(Object, back_populates="thread")
 
-    accounted: Mapped[bool] = mapped_column(nullable=False, default=True)
     status: Mapped[ThreadStatus] = mapped_column(
         ENUM(ThreadStatus),
         default=ThreadStatus.OPEN,

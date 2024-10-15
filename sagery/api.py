@@ -66,6 +66,7 @@ async def get_one_thread(job_id: int, thread_name: str, session: Session = Depen
 async def add_object(
         job_id: int,
         thread_name: str,
+        index: int,
         object_data: dict[str, str],
         session: Session = Depends(get_session)
 ):
