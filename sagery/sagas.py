@@ -10,6 +10,15 @@ class Thread:
     managed: bool
 
 
+@dataclass(frozen=True)
+class Function:
+    # pylint: disable=missing-class-docstring
+    name: str
+    property: dict
+    threads: list[str]
+    operator: str
+
+
 class AbstractSaga(ABC):
     """
     Abstract base class for sagas.
@@ -19,14 +28,22 @@ class AbstractSaga(ABC):
 
     @property
     @abstractmethod
-    def thread_list(self) -> list[Thread]:
+    def threads(self) -> list[Thread]:
         """
         Property should contain a list of Thread objects.
         """
         raise NotImplementedError
 
+    @property
+    @abstractmethod
+    def functions(self) -> list[Function]:
+        """
+        Property should contain a list of functions objects.
+        """
+        raise NotImplementedError
+
     async def run(self) -> None:
         """
-        Main function of Saga: implement long launch, with cycle inside, until job finishes.
+        Main function of Saga: implement long launch, with cycle inside, until job was finished.
         """
         raise NotImplementedError

@@ -1,9 +1,9 @@
-from sqlalchemy import ForeignKey, Index, Integer, String
+from sqlalchemy import Boolean, ForeignKey, Index, Integer, String
 from sqlalchemy.dialects.postgresql import ENUM, JSONB
 from sqlalchemy.orm import (DeclarativeBase, Mapped, MappedAsDataclass,
                             mapped_column, relationship)
 
-from sagery.enums import ObjectStatus, Status, ThreadStatus
+from sagery.enums import Status, ThreadStatus
 
 
 class Base(MappedAsDataclass, DeclarativeBase):
@@ -35,19 +35,13 @@ class Object(Base):
     id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)
     thread_id: Mapped[int] = mapped_column(ForeignKey("threads.id", ondelete='CASCADE'), nullable=False)
     thread: Mapped["Thread"] = relationship(back_populates="objects", passive_deletes=True)
-    index: Mapped[int] = mapped_column(Integer(), nullable=False)  # ??? todo
+    index: Mapped[int] = mapped_column(Integer(), nullable=False)
 
     items: Mapped[list[Item]] = relationship(
         Item,
         back_populates="object",
     )
     request: Mapped["Request"] = relationship("Request", back_populates="object")
-    status: Mapped[ObjectStatus] = mapped_column(
-        ENUM(ObjectStatus),
-        default=ObjectStatus.NONE,
-        nullable=False,
-        index=True
-    )
 
     __table_args__ = (
         Index("uix_objects", 'thread_id', "index", unique=True),
@@ -55,34 +49,27 @@ class Object(Base):
 
 
 class FunctionCall(Base):
+    # pylint: disable=too-few-public-methods
     """
     Function launch.
     """
     __tablename__ = "function_calls"
 
     id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)
-    data: Mapped[dict] = mapped_column(JSONB, nullable=True)
+    job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id", ondelete='CASCADE'), nullable=False, index=True)
+    job: Mapped["Job"] = relationship(back_populates="function_calls", passive_deletes=True)
+    num: Mapped[int] = mapped_column(Integer(), nullable=False)
+    name: Mapped[str] = mapped_column(String(), nullable=False)
+    properties: Mapped[dict] = mapped_column(JSONB, nullable=True)
+    threads: Mapped[list["Thread"]] = relationship(
+        secondary="function_call_thread", back_populates="function_calls"
+    )
+    index: Mapped[int] = mapped_column(Integer(), nullable=False, default=0)
+    status: Mapped[Status] = mapped_column(ENUM(Status), default=Status.PENDING, nullable=False, index=True)
 
-
-class ObjectFunctionCallRelation(Base):
-    """
-    Object FunctionCall relation.
-    """
-    __tablename__ = "object_function_call_relations"
-    id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)
-    object_id: Mapped[int] = mapped_column(ForeignKey('objects.id', ondelete='CASCADE'), ondelete='CASCADE')
-    object: Mapped["Object"] = relationship(back_populates="object_function_call_relations")
-    function_call_id: Mapped[FunctionCall] = mapped_column(ForeignKey('function_calls.id', ondelete='CASCADE'), nullable=False)
-    function_call: Mapped[FunctionCall] = relationship(FunctionCall, back_populates="object_function_call_relations")
-
-
-class Data(Base):
-    data: Mapped[dict] = mapped_column(JSONB())
-    raise NotImplementedError
-
-
-class ObjectFunctionRelation:
-    # todo!!!!
+    __table_args__ = (
+        Index("uix_job_function_call", 'job_id', "num", unique=True),
+    )
 
 
 class Thread(Base):
@@ -96,10 +83,13 @@ class Thread(Base):
     job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id", ondelete='CASCADE'), nullable=False, index=True)
     job: Mapped["Job"] = relationship(back_populates="threads", passive_deletes=True)
     name: Mapped[str] = mapped_column(String(), nullable=False)
-    accounted: Mapped[bool] = mapped_column(nullable=False)
-    managed: Mapped[bool] = mapped_column(nullable=False)
+    accounted: Mapped[bool] = mapped_column(Boolean(), nullable=False)
+    managed: Mapped[bool] = mapped_column(Boolean(), nullable=False)
 
     objects: Mapped[list[Object]] = relationship(Object, back_populates="thread")
+    function_calls: Mapped[list[FunctionCall]] = relationship(
+        secondary="function_call_thread", back_populates="threads"
+    )
 
     status: Mapped[ThreadStatus] = mapped_column(
         ENUM(ThreadStatus),
@@ -110,6 +100,22 @@ class Thread(Base):
 
     __table_args__ = (
         Index("uix_job_thread", 'job_id', "name", unique=True),
+    )
+
+
+class FunctionCallThread(Base):
+    # pylint: disable=too-few-public-methods
+    """
+    Class for representing many-to-many relationship between threads and function_calls.
+    """
+    __tablename__ = "function_call_thread"
+
+    id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)
+    function_call_id = mapped_column(ForeignKey("function_calls.id", ondelete='CASCADE'), nullable=False)
+    thread_id = mapped_column(ForeignKey("threads.id", ondelete='CASCADE'), nullable=False)
+
+    __table_args__ = (
+        Index("uix_function_call_thread", 'function_call_id', "thread_id", unique=True),
     )
 
 
@@ -138,9 +144,5 @@ class Job(Base):
     id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)
     name: Mapped[str] = mapped_column(String(), nullable=False, index=True)
     threads: Mapped[list[Thread]] = relationship(back_populates="job")
-    # requests: Mapped[list[Request]] = relationship(  todo: fix it
-    #     back_populates="job",
-    #     primaryjoin='and_(Job.id==Thread.job_id, Object.thread_id==Thread.id, Object.id==Request.object_id)',
-    #     viewonly=True,
-    # )
+    function_calls: Mapped[list[FunctionCall]] = relationship(back_populates="job")
     status: Mapped[Status] = mapped_column(ENUM(Status), default=Status.PENDING, nullable=False, index=True)

@@ -23,7 +23,7 @@ async def create_job(name: str, session: Session = Depends(get_session)):
     thread_repository = ThreadRepository(session)
 
     job: Job = await job_repository.create(name=name)
-    for thread in saga.thread_list:
+    for thread in saga.threads:
         await thread_repository.create(job_id=job.id, name=thread.name, accounted=thread.accounted)
 
     session.commit()

@@ -20,14 +20,6 @@ class Status(Enum):
     FAILED = 'FAILED'
 
 
-class ObjectStatus(Enum):
-    """
-    All possible object statuses.
-    """
-    NONE = 'NONE'
-    USED = 'USED'
-
-
 class ThreadStatus(Enum):
     """
     All possible Thread statuses.
