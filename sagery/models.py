@@ -1,5 +1,5 @@
 from sqlalchemy import ForeignKey, Index, Integer, String
-from sqlalchemy.dialects.postgresql import ENUM
+from sqlalchemy.dialects.postgresql import ENUM, JSONB
 from sqlalchemy.orm import (DeclarativeBase, Mapped, MappedAsDataclass,
                             mapped_column, relationship)
 
@@ -35,7 +35,7 @@ class Object(Base):
     id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)
     thread_id: Mapped[int] = mapped_column(ForeignKey("threads.id", ondelete='CASCADE'), nullable=False)
     thread: Mapped["Thread"] = relationship(back_populates="objects", passive_deletes=True)
-    index: Mapped[int] = mapped_column(Integer(), nullable=False)
+    index: Mapped[int] = mapped_column(Integer(), nullable=False)  # ??? todo
 
     items: Mapped[list[Item]] = relationship(
         Item,
@@ -52,6 +52,37 @@ class Object(Base):
     __table_args__ = (
         Index("uix_objects", 'thread_id', "index", unique=True),
     )
+
+
+class FunctionCall(Base):
+    """
+    Function launch.
+    """
+    __tablename__ = "function_calls"
+
+    id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)
+    data: Mapped[dict] = mapped_column(JSONB, nullable=True)
+
+
+class ObjectFunctionCallRelation(Base):
+    """
+    Object FunctionCall relation.
+    """
+    __tablename__ = "object_function_call_relations"
+    id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)
+    object_id: Mapped[int] = mapped_column(ForeignKey('objects.id', ondelete='CASCADE'), ondelete='CASCADE')
+    object: Mapped["Object"] = relationship(back_populates="object_function_call_relations")
+    function_call_id: Mapped[FunctionCall] = mapped_column(ForeignKey('function_calls.id', ondelete='CASCADE'), nullable=False)
+    function_call: Mapped[FunctionCall] = relationship(FunctionCall, back_populates="object_function_call_relations")
+
+
+class Data(Base):
+    data: Mapped[dict] = mapped_column(JSONB())
+    raise NotImplementedError
+
+
+class ObjectFunctionRelation:
+    # todo!!!!
 
 
 class Thread(Base):
