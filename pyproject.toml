@@ -16,6 +16,7 @@ pydantic-settings = "^2.4.0"
 fastapi = "^0.114.0"
 uvicorn = "^0.30.6"
 psycopg2 = "^2.9.9"
+pytest-asyncio = "^0.24.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.1.1"
@@ -30,6 +31,9 @@ pyenchant = "^3.2.2"
 black = "^24.10.0"
 ruff = "^0.6.9"
 pre-commit = "^4.0.1"
+pytest-black = "^0.3.12"
+pytest-ruff = "^0.4.1"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
@@ -44,9 +48,10 @@ line-length = 120
 [tool.ruff]
 # Same as Black.
 line-length = 120
+cache-dir = "~/.cache/ruff"
+exclude = [".venv", "alembic"]
 
-exclude = ["jupyter_notebook_config.py"]
-select = [
+lint.select = [
     "E",  # pycodestyle errors (settings from FastAPI, thanks, @tiangolo!)
     "W",  # pycodestyle warnings
     "F",  # pyflakes
@@ -54,14 +59,34 @@ select = [
     "C",  # flake8-comprehensions
     "B",  # flake8-bugbear
 ]
-ignore = [
+lint.ignore = [
     "E501",  # line too long, handled by black
     "C901",  # too complex
 ]
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 order-by-type = true
 relative-imports-order = "closest-to-furthest"
 extra-standard-library = ["typing"]
 section-order = ["future", "standard-library", "third-party", "first-party", "local-folder"]
 known-first-party = []
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+filterwarnings = [
+    "error",
+    "ignore::UserWarning",
+    # note the use of single quote below to denote "raw" strings in TOML
+    'ignore:function ham\(\) is deprecated:DeprecationWarning',
+]
+addopts = "-vvv --mypy --black --ruff --cov=sagery"
+testpaths = [
+    "tests",
+]
+
+[[tool.mypy.overrides]]
+module = "sagery.*"
+#ignore_missing_imports = true
+
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = ["fastapi.Depends", "fastapi.params.Depends", "fastapi.Query", "fastapi.params.Query"]

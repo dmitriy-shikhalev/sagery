@@ -9,13 +9,12 @@ from sagery.main import main
 @patch("sagery.main.read_list_from_json_file")
 @patch("sagery.main.Settings")
 @patch("sagery.main.uvicorn.run")
-@patch("sagery.main.argparse.ArgumentParser", return_value=Mock(
-    parse_args=Mock(
-        return_value=Mock(
-            mode='web'
-        )
+@patch(
+    "sagery.main.argparse.ArgumentParser",
+    return_value=Mock(
+        parse_args=Mock(return_value=Mock(mode='web')),
     ),
-))
+)
 def test_main_web(argument_parser_mock, run_mock, settings_mock, read_list_from_json_file_mock, collect_all_mock):
     # pylint: disable=missing-function-docstring
     main()
@@ -27,9 +26,7 @@ def test_main_web(argument_parser_mock, run_mock, settings_mock, read_list_from_
     settings_mock.assert_called_once_with()
 
     run_mock.assert_called_once_with(
-        app,
-        host=settings_mock.return_value.common.host,
-        port=settings_mock.return_value.common.port
+        app, host=settings_mock.return_value.common.host, port=settings_mock.return_value.common.port
     )
 
     read_list_from_json_file_mock.assert_any_call(settings_mock.return_value.common.jobs_list_filename)
@@ -45,13 +42,12 @@ def test_main_web(argument_parser_mock, run_mock, settings_mock, read_list_from_
 @patch("sagery.main.read_list_from_json_file")
 @patch("sagery.main.Settings")
 @patch("sagery.main.run")
-@patch("sagery.main.argparse.ArgumentParser", return_value=Mock(
-    parse_args=Mock(
-        return_value=Mock(
-            mode='core'
-        )
+@patch(
+    "sagery.main.argparse.ArgumentParser",
+    return_value=Mock(
+        parse_args=Mock(return_value=Mock(mode='core')),
     ),
-))
+)
 def test_main_core(argument_parser_mock, run_mock, settings_mock, read_list_from_json_file_mock, collect_all_mock):
     # pylint: disable=missing-function-docstring
     main()

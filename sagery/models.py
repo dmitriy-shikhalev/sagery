@@ -1,7 +1,6 @@
 from sqlalchemy import ForeignKey, Index, Integer, String
 from sqlalchemy.dialects.postgresql import ENUM
-from sqlalchemy.orm import (DeclarativeBase, Mapped, MappedAsDataclass,
-                            mapped_column, relationship)
+from sqlalchemy.orm import DeclarativeBase, Mapped, MappedAsDataclass, mapped_column, relationship
 
 from sagery.enums import Status, ThreadStatus
 
@@ -43,9 +42,7 @@ class Object(Base):
     )
     request: Mapped["Request"] = relationship("Request", back_populates="object")
 
-    __table_args__ = (
-        Index("uix_objects", 'thread_id', "index", unique=True),
-    )
+    __table_args__ = (Index("uix_objects", 'thread_id', "index", unique=True),)
 
 
 class FunctionCall(Base):
@@ -63,9 +60,7 @@ class FunctionCall(Base):
     index: Mapped[int] = mapped_column(Integer(), nullable=False, default=0)
     status: Mapped[Status] = mapped_column(ENUM(Status), default=Status.PENDING, nullable=False, index=True)
 
-    __table_args__ = (
-        Index("uix_job_function_call", 'job_id', "pos", unique=True),
-    )
+    __table_args__ = (Index("uix_job_function_call", 'job_id', "pos", unique=True),)
 
 
 class Thread(Base):
@@ -85,15 +80,10 @@ class Thread(Base):
     objects: Mapped[list[Object]] = relationship(Object, back_populates="thread")
 
     status: Mapped[ThreadStatus] = mapped_column(
-        ENUM(ThreadStatus),
-        default=ThreadStatus.OPEN,
-        nullable=False,
-        index=True
+        ENUM(ThreadStatus), default=ThreadStatus.OPEN, nullable=False, index=True
     )
 
-    __table_args__ = (
-        Index("uix_job_thread", 'job_id', "name", unique=True),
-    )
+    __table_args__ = (Index("uix_job_thread", 'job_id', "name", unique=True),)
 
 
 # class FunctionCallThread(Base):  # todo: is it needed?
@@ -116,6 +106,7 @@ class Request(Base):
     """
     Class for representing a request in the sagery database.
     """
+
     # pylint: disable=too-few-public-methods
     __tablename__ = "requests"
 

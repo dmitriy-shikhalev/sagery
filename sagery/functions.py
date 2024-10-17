@@ -6,6 +6,7 @@ class AbstractFunction(ABC):
     """
     Abstract base class for all functions.
     """
+
     def __init__(self, *vars_: str, **kwargs):
         self.vars = vars_
         self.kwargs = kwargs

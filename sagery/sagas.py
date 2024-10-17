@@ -23,6 +23,7 @@ class AbstractSaga(ABC):
     """
     Abstract base class for sagas.
     """
+
     def __init__(self, job_id: int):
         self.job_id = job_id
 

@@ -12,6 +12,7 @@ class AbstractRepository(ABC):
     """
     Abstract base class for repositories.
     """
+
     @property
     @abstractmethod
     def model(self) -> TableClause:
@@ -52,6 +53,7 @@ class JobRepository(AbstractRepository):
     """
     Class for repository for Jobs.
     """
+
     model = Job  # type: ignore
 
 
@@ -59,6 +61,7 @@ class ThreadRepository(AbstractRepository):
     """
     Class for repository for Vars.
     """
+
     model = Thread  # type: ignore
 
 
@@ -66,6 +69,7 @@ class ObjectRepository(AbstractRepository):
     """
     Class for repository for Objects.
     """
+
     model = Object  # type: ignore
 
 
@@ -73,6 +77,7 @@ class ItemRepository(AbstractRepository):
     """
     Class for repository for Items.
     """
+
     model = Item  # type: ignore
 
 
@@ -80,4 +85,5 @@ class RequestRepository(AbstractRepository):
     """
     Class for repository for Requests.
     """
+
     model = Request  # type: ignore

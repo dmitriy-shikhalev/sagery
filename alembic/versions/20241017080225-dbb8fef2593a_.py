@@ -5,11 +5,12 @@ Revises: 61fe3c47683d
 Create Date: 2024-10-17 08:02:25.572159
 
 """
+
 from typing import Sequence, Union
 
-from alembic import op
 import sqlalchemy as sa
 
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = 'dbb8fef2593a'
@@ -33,13 +34,21 @@ def downgrade() -> None:
     op.add_column('threads', sa.Column('managed', sa.BOOLEAN(), autoincrement=False, nullable=False))
     op.add_column('threads', sa.Column('accounted', sa.BOOLEAN(), autoincrement=False, nullable=False))
     op.add_column('function_calls', sa.Column('name', sa.VARCHAR(), autoincrement=False, nullable=False))
-    op.create_table('function_call_thread',
-    sa.Column('id', sa.INTEGER(), autoincrement=True, nullable=False),
-    sa.Column('function_call_id', sa.INTEGER(), autoincrement=False, nullable=False),
-    sa.Column('thread_id', sa.INTEGER(), autoincrement=False, nullable=False),
-    sa.ForeignKeyConstraint(['function_call_id'], ['function_calls.id'], name='function_call_thread_function_call_id_fkey', ondelete='CASCADE'),
-    sa.ForeignKeyConstraint(['thread_id'], ['threads.id'], name='function_call_thread_thread_id_fkey', ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('id', name='function_call_thread_pkey')
+    op.create_table(
+        'function_call_thread',
+        sa.Column('id', sa.INTEGER(), autoincrement=True, nullable=False),
+        sa.Column('function_call_id', sa.INTEGER(), autoincrement=False, nullable=False),
+        sa.Column('thread_id', sa.INTEGER(), autoincrement=False, nullable=False),
+        sa.ForeignKeyConstraint(
+            ['function_call_id'],
+            ['function_calls.id'],
+            name='function_call_thread_function_call_id_fkey',
+            ondelete='CASCADE',
+        ),
+        sa.ForeignKeyConstraint(
+            ['thread_id'], ['threads.id'], name='function_call_thread_thread_id_fkey', ondelete='CASCADE'
+        ),
+        sa.PrimaryKeyConstraint('id', name='function_call_thread_pkey'),
     )
     op.create_index('uix_function_call_thread', 'function_call_thread', ['function_call_id', 'thread_id'], unique=True)
     # ### end Alembic commands ###

@@ -30,3 +30,8 @@ alembic revision --autogenerate
 ```shell
 uvicorn sagery.api:app --reload
 ```
+
+## Run pytest:
+```shell
+poetry run pytest -vvv --mypy --black --ruff --cov=sagery
+```

@@ -6,6 +6,7 @@ class PostgresqlSettings(BaseSettings):
     """
     Settings for PostgreSQL database connection.
     """
+
     model_config = SettingsConfigDict(env_file='.env', env_prefix='POSTGRESQL_', extra='allow')
 
     host: str
@@ -19,6 +20,7 @@ class CommonSettings(BaseSettings):
     """
     Common server settings.
     """
+
     model_config = SettingsConfigDict(env_file='.env', env_prefix='COMMON_', extra='allow')
 
     host: str = 'localhost'
@@ -31,6 +33,7 @@ class Settings(BaseSettings):
     """
     Hole settings class.
     """
+
     model_config = SettingsConfigDict(env_file='.env')
 
     sqlalchemy_url: AnyUrl

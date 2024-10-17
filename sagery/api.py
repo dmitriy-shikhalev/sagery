@@ -64,11 +64,7 @@ async def get_one_thread(job_id: int, thread_name: str, session: Session = Depen
 
 @app.post('/jobs/{job_id:int}/threads/{thread_name}/objects/')
 async def add_object(
-        job_id: int,
-        thread_name: str,
-        index: int,
-        object_data: dict[str, str],
-        session: Session = Depends(get_session)
+    job_id: int, thread_name: str, index: int, object_data: dict[str, str], session: Session = Depends(get_session)
 ):
     """
     API endpoint for adding object to thread.
