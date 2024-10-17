@@ -51,7 +51,12 @@ line-length = 120
 cache-dir = "~/.cache/ruff"
 exclude = [".venv", "alembic"]
 
+# Allow autofix for all enabled rules (when `--fix`) is provided.
+lint.fixable = ["ALL"]
+lint.unfixable = []
+
 lint.select = [
+    "D",  # docstrings?
     "E",  # pycodestyle errors (settings from FastAPI, thanks, @tiangolo!)
     "W",  # pycodestyle warnings
     "F",  # pyflakes
@@ -62,6 +67,7 @@ lint.select = [
 lint.ignore = [
     "E501",  # line too long, handled by black
     "C901",  # too complex
+    "D100",  # Missing docstring in public module
 ]
 
 [tool.ruff.lint.isort]
@@ -79,7 +85,7 @@ filterwarnings = [
     # note the use of single quote below to denote "raw" strings in TOML
     'ignore:function ham\(\) is deprecated:DeprecationWarning',
 ]
-addopts = "-vvv --mypy --black --ruff --cov=sagery"
+addopts = "-vvv --mypy --black --ruff --cov=sagery --no-cov-on-fail"
 testpaths = [
     "tests",
 ]

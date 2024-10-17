@@ -7,9 +7,7 @@ from sagery.settings import PostgresqlSettings
 
 
 def get_engine():
-    """
-    Return a sqlalchemy engine instance.
-    """
+    """Return a sqlalchemy engine instance."""
     settings = PostgresqlSettings()
     engine = create_engine(
         f"postgresql+psycopg2://{settings.user}:{settings.password}"
@@ -19,9 +17,7 @@ def get_engine():
 
 
 def get_session() -> Generator[Session, None, None]:
-    """
-    Return a sqlalchemy session instance.
-    """
+    """Return a sqlalchemy session instance."""
     engine = get_engine()
     with Session(engine) as session:
         yield session

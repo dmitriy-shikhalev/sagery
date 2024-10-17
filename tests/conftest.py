@@ -12,7 +12,7 @@ from sagery.repositories import JobRepository
 
 @fixture()
 def test_session() -> Generator[Session, None, None]:
-    # pylint: disable=missing-function-docstring, not-context-manager
+    """Test session fixture"""  # noqa: D400, D415
     session = next(get_session(), None)
     if session is None:
         raise RuntimeError('Session is None!')
@@ -26,9 +26,7 @@ def test_session() -> Generator[Session, None, None]:
 
 @fixture()
 def session_override():
-    """
-    Override the DB session.
-    """
+    """Override the DB session."""
     session_mock = Mock()
 
     def get_session_override():
@@ -42,9 +40,7 @@ def session_override():
 
 
 @fixture()
-async def job(test_session: Session) -> AsyncGenerator[Job, None]:  # pylint: disable=redefined-outer-name
-    """
-    Job fixture.
-    """
+async def job(test_session: Session) -> AsyncGenerator[Job, None]:
+    """Job fixture."""
     job_ = await JobRepository(test_session).create(a='b')
     yield job_

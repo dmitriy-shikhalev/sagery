@@ -2,9 +2,7 @@ from sagery.repositories import JobRepository
 
 
 async def test_job_create_with_filter_by(test_session):
-    """
-    Test of JobRepository class, method "create".
-    """
+    """Test of JobRepository class, method "create"."""
     job_repository = JobRepository(test_session)
     job = await job_repository.create(name='test name')
 
@@ -16,9 +14,7 @@ async def test_job_create_with_filter_by(test_session):
 
 
 async def test_job_create_with_get(test_session):
-    """
-    Test of JobRepository class, method "create".
-    """
+    """Test of JobRepository class, method "create"."""
     job_repository = JobRepository(test_session)
     job = await job_repository.create(name='test name')
 

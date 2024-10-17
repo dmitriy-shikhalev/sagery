@@ -2,9 +2,7 @@ from enum import Enum, StrEnum
 
 
 class Mode(StrEnum):
-    """
-    Mode types.
-    """
+    """Mode types."""
 
     WEB = 'web'
     CORE = 'core'
@@ -12,9 +10,7 @@ class Mode(StrEnum):
 
 # DB enums
 class Status(Enum):
-    """
-    All possible statuses for jobs and requests.
-    """
+    """All possible statuses for jobs and requests."""
 
     PENDING = 'PENDING'
     RUNNING = 'RUNNING'
@@ -23,9 +19,7 @@ class Status(Enum):
 
 
 class ThreadStatus(Enum):
-    """
-    All possible Thread statuses.
-    """
+    """All possible Thread statuses."""
 
     OPEN = 'OPEN'
     CLOSED = 'CLOSED'

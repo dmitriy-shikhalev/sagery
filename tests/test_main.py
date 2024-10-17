@@ -15,8 +15,9 @@ from sagery.main import main
         parse_args=Mock(return_value=Mock(mode='web')),
     ),
 )
-def test_main_web(argument_parser_mock, run_mock, settings_mock, read_list_from_json_file_mock, collect_all_mock):
-    # pylint: disable=missing-function-docstring
+def test_main_web(  # noqa: D103
+    argument_parser_mock, run_mock, settings_mock, read_list_from_json_file_mock, collect_all_mock
+):
     main()
 
     argument_parser_mock.assert_called_once()
@@ -48,8 +49,9 @@ def test_main_web(argument_parser_mock, run_mock, settings_mock, read_list_from_
         parse_args=Mock(return_value=Mock(mode='core')),
     ),
 )
-def test_main_core(argument_parser_mock, run_mock, settings_mock, read_list_from_json_file_mock, collect_all_mock):
-    # pylint: disable=missing-function-docstring
+def test_main_core(  # noqa: D103
+    argument_parser_mock, run_mock, settings_mock, read_list_from_json_file_mock, collect_all_mock
+):
     main()
 
     argument_parser_mock.assert_called_once()

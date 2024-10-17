@@ -6,15 +6,12 @@ from sagery.enums import Status, ThreadStatus
 
 
 class Base(MappedAsDataclass, DeclarativeBase):
-    # pylint: disable=too-few-public-methods
-    """subclasses will be converted to dataclasses"""
+    """subclasses will be converted to dataclasses."""
 
 
 class Item(Base):
-    # pylint: disable=too-few-public-methods
-    """
-    Class for representing an item in the sagery database.
-    """
+    """Class for representing an item in the sagery database."""
+
     __tablename__ = "items"
 
     id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)
@@ -25,10 +22,8 @@ class Item(Base):
 
 
 class Object(Base):
-    # pylint: disable=too-few-public-methods
-    """
-    Class for representing an object in the sagery database.
-    """
+    """Class for representing an object in the sagery database."""
+
     __tablename__ = "objects"
 
     id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)
@@ -46,10 +41,8 @@ class Object(Base):
 
 
 class FunctionCall(Base):
-    # pylint: disable=too-few-public-methods
-    """
-    Function launch.
-    """
+    """Function launch."""
+
     __tablename__ = "function_calls"
 
     id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)
@@ -64,10 +57,8 @@ class FunctionCall(Base):
 
 
 class Thread(Base):
-    # pylint: disable=too-few-public-methods
-    """
-    Class for representing a thread in the sagery database.
-    """
+    """Class for representing a thread in the sagery database."""
+
     __tablename__ = "threads"
 
     id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)
@@ -87,7 +78,6 @@ class Thread(Base):
 
 
 # class FunctionCallThread(Base):  # todo: is it needed?
-#     # pylint: disable=too-few-public-methods
 #     """
 #     Class for representing many-to-many relationship between threads and function_calls.
 #     """
@@ -103,11 +93,8 @@ class Thread(Base):
 
 
 class Request(Base):
-    """
-    Class for representing a request in the sagery database.
-    """
+    """Class for representing a request in the sagery database."""
 
-    # pylint: disable=too-few-public-methods
     __tablename__ = "requests"
 
     id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)
@@ -119,10 +106,8 @@ class Request(Base):
 
 
 class Job(Base):
-    # pylint: disable=too-few-public-methods
-    """
-    Class for representing a job in the sagery database.
-    """
+    """Class for representing a job in the sagery database."""
+
     __tablename__ = "jobs"
 
     id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)

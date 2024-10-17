@@ -14,9 +14,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 def read_list_from_json_file(filename):
-    """
-    Reads a JSON file and returns a list of content.
-    """
+    """Reads a JSON file and returns a list of content."""  # noqa: D401
     return json.load(
         open(
             filename,
@@ -26,9 +24,7 @@ def read_list_from_json_file(filename):
 
 
 def main():
-    """
-    Main function. Entry point for web and core.
-    """
+    """Main function. Entry point for web and core."""  # noqa: D401
     args = argparse.ArgumentParser()
     args.add_argument("mode", help="mode", choices=Mode)
 

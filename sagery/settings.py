@@ -3,9 +3,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class PostgresqlSettings(BaseSettings):
-    """
-    Settings for PostgreSQL database connection.
-    """
+    """Settings for PostgreSQL database connection."""
 
     model_config = SettingsConfigDict(env_file='.env', env_prefix='POSTGRESQL_', extra='allow')
 
@@ -17,9 +15,7 @@ class PostgresqlSettings(BaseSettings):
 
 
 class CommonSettings(BaseSettings):
-    """
-    Common server settings.
-    """
+    """Common server settings."""
 
     model_config = SettingsConfigDict(env_file='.env', env_prefix='COMMON_', extra='allow')
 
@@ -30,9 +26,7 @@ class CommonSettings(BaseSettings):
 
 
 class Settings(BaseSettings):
-    """
-    Hole settings class.
-    """
+    """Hole settings class."""
 
     model_config = SettingsConfigDict(env_file='.env')
 
