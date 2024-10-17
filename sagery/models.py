@@ -1,5 +1,5 @@
 from sqlalchemy import Boolean, ForeignKey, Index, Integer, String
-from sqlalchemy.dialects.postgresql import ENUM, JSONB
+from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.orm import (DeclarativeBase, Mapped, MappedAsDataclass,
                             mapped_column, relationship)
 
@@ -58,17 +58,13 @@ class FunctionCall(Base):
     id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)
     job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id", ondelete='CASCADE'), nullable=False, index=True)
     job: Mapped["Job"] = relationship(back_populates="function_calls", passive_deletes=True)
-    num: Mapped[int] = mapped_column(Integer(), nullable=False)
+    pos: Mapped[int] = mapped_column(Integer(), nullable=False)
     name: Mapped[str] = mapped_column(String(), nullable=False)
-    properties: Mapped[dict] = mapped_column(JSONB, nullable=True)
-    threads: Mapped[list["Thread"]] = relationship(
-        secondary="function_call_thread", back_populates="function_calls"
-    )
     index: Mapped[int] = mapped_column(Integer(), nullable=False, default=0)
     status: Mapped[Status] = mapped_column(ENUM(Status), default=Status.PENDING, nullable=False, index=True)
 
     __table_args__ = (
-        Index("uix_job_function_call", 'job_id', "num", unique=True),
+        Index("uix_job_function_call", 'job_id', "pos", unique=True),
     )
 
 
@@ -87,9 +83,6 @@ class Thread(Base):
     managed: Mapped[bool] = mapped_column(Boolean(), nullable=False)
 
     objects: Mapped[list[Object]] = relationship(Object, back_populates="thread")
-    function_calls: Mapped[list[FunctionCall]] = relationship(
-        secondary="function_call_thread", back_populates="threads"
-    )
 
     status: Mapped[ThreadStatus] = mapped_column(
         ENUM(ThreadStatus),
