@@ -21,8 +21,8 @@ class Item(Base):
     id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)
     object_id: Mapped[int] = mapped_column(ForeignKey("objects.id", ondelete='CASCADE'), nullable=False, index=True)
     object: Mapped["Object"] = relationship(back_populates="items", passive_deletes=True)
-    key: Mapped[str] = mapped_column(nullable=False, index=True)
-    value: Mapped[str] = mapped_column(String(), nullable=False, default='null')
+    key: Mapped[str] = mapped_column(String(), nullable=False, index=True)
+    value: Mapped[str] = mapped_column(String(), nullable=True)
 
 
 class Object(Base):
