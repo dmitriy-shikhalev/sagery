@@ -1,0 +1,67 @@
+services:
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB_NAME: "${POSTGRESQL_DB_NAME}"
+      POSTGRES_USER: "${POSTGRESQL_USER}"
+      POSTGRES_PASSWORD: "${POSTGRESQL_PASSWORD}"
+      POSTGRES_DB: "${POSTGRESQL_DB_NAME}"  # ???
+      POSTGRES_HOST: db
+      PGUSER: "${POSTGRESQL_USER}"
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d ${POSTGRESQL_DB_NAME} -U ${POSTGRESQL_USER}"]
+      interval: 5s
+      timeout: 60s
+      retries: 3
+      start_period: 40s
+      start_interval: 5s
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    ports:
+      - "5435:5432"
+
+  web:
+    build:
+      target: base
+    environment:
+      POSTGRESQL_DB_NAME: "${POSTGRESQL_DB_NAME}"
+      POSTGRESQL_USER: "${POSTGRESQL_USER}"
+      POSTGRESQL_PASSWORD: "${POSTGRESQL_PASSWORD}"
+      POSTGRESQL_HOST: "${POSTGRESQL_HOST}"
+      POSTGRESQL_PORT: "${POSTGRESQL_PORT}"
+
+      COMMON_HOST: "${COMMON_HOST}"
+      COMMON_PORT: "${COMMON_PORT}"
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    command:
+      - poetry
+      - run
+      - sagery
+      - web
+
+  core:
+    build:
+      target: base
+    environment:
+      POSTGRESQL_DB_NAME: "${POSTGRESQL_DB_NAME}"
+      POSTGRESQL_USER: "${POSTGRESQL_USER}"
+      POSTGRESQL_PASSWORD: "${POSTGRESQL_PASSWORD}"
+      POSTGRESQL_HOST: "${POSTGRESQL_HOST}"
+      POSTGRESQL_PORT: "${POSTGRESQL_PORT}"
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    command:
+      - poetry
+      - run
+      - sagery
+      - core
+
+volumes:
+  pg-data:
