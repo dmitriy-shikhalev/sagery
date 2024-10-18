@@ -35,4 +35,6 @@ uvicorn sagery.api:app --reload
 ```shell
 poetry run pytest -vvv --mypy --black --ruff --cov=sagery
 poetry run ruff check sagery --fix
+poetry run black sagery/
+poetry run black tests/
 ```

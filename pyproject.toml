@@ -42,8 +42,9 @@ build-backend = "poetry.core.masonry.api"
 sagery = "sagery.main:main"
 
 [tool.black]
-skip-string-normalization = true
 line-length = 120
+target-version = ['py312']
+include = '\.pyi?$'
 
 [tool.ruff]
 # Same as Black.
@@ -59,7 +60,7 @@ lint.fixable = ["ALL"]
 lint.unfixable = []
 
 lint.select = [
-    "D",  # docstrings?
+    "D",  # docstrings
     "E",  # pycodestyle errors (settings from FastAPI, thanks, @tiangolo!)
     "W",  # pycodestyle warnings
     "F",  # pyflakes
@@ -69,6 +70,7 @@ lint.select = [
 ]
 lint.ignore = [
     "E501",  # line too long, handled by black
+    "W292",  # no new line at end of file, handled by black
     "C901",  # too complex
     "D100",  # Missing docstring in public module
 ]
@@ -125,7 +127,6 @@ testpaths = [
 
 [[tool.mypy.overrides]]
 module = "sagery.*"
-#ignore_missing_imports = true
 
 [tool.ruff.lint.flake8-bugbear]
 extend-immutable-calls = ["fastapi.Depends", "fastapi.params.Depends", "fastapi.Query", "fastapi.params.Query"]

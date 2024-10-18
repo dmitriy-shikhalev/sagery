@@ -15,7 +15,7 @@ def test_session() -> Generator[Session, None, None]:
     """Test session fixture"""  # noqa: D400, D415
     session = next(get_session(), None)
     if session is None:
-        raise RuntimeError('Session is None!')
+        raise RuntimeError("Session is None!")
 
     try:
         yield session
@@ -42,5 +42,5 @@ def session_override():
 @fixture()
 async def job(test_session: Session) -> AsyncGenerator[Job, None]:
     """Job fixture."""
-    job_ = await JobRepository(test_session).create(a='b')
+    job_ = await JobRepository(test_session).create(a="b")
     yield job_

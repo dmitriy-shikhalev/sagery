@@ -18,7 +18,7 @@ def read_list_from_json_file(filename):
     return json.load(
         open(
             filename,
-            encoding='utf-8',
+            encoding="utf-8",
         )
     )
 

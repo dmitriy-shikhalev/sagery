@@ -15,7 +15,7 @@ class Item(Base):
     __tablename__ = "items"
 
     id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)
-    object_id: Mapped[int] = mapped_column(ForeignKey("objects.id", ondelete='CASCADE'), nullable=False, index=True)
+    object_id: Mapped[int] = mapped_column(ForeignKey("objects.id", ondelete="CASCADE"), nullable=False, index=True)
     object: Mapped["Object"] = relationship(back_populates="items", passive_deletes=True)
     key: Mapped[str] = mapped_column(String(), nullable=False, index=True)
     value: Mapped[str] = mapped_column(String(), nullable=True)
@@ -27,7 +27,7 @@ class Object(Base):
     __tablename__ = "objects"
 
     id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)
-    thread_id: Mapped[int] = mapped_column(ForeignKey("threads.id", ondelete='CASCADE'), nullable=False)
+    thread_id: Mapped[int] = mapped_column(ForeignKey("threads.id", ondelete="CASCADE"), nullable=False)
     thread: Mapped["Thread"] = relationship(back_populates="objects", passive_deletes=True)
     index: Mapped[int] = mapped_column(Integer(), nullable=False)
 
@@ -37,7 +37,7 @@ class Object(Base):
     )
     request: Mapped["Request"] = relationship("Request", back_populates="object")
 
-    __table_args__ = (Index("uix_objects", 'thread_id', "index", unique=True),)
+    __table_args__ = (Index("uix_objects", "thread_id", "index", unique=True),)
 
 
 class FunctionCall(Base):
@@ -46,13 +46,13 @@ class FunctionCall(Base):
     __tablename__ = "function_calls"
 
     id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)
-    job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id", ondelete='CASCADE'), nullable=False, index=True)
+    job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id", ondelete="CASCADE"), nullable=False, index=True)
     job: Mapped["Job"] = relationship(back_populates="function_calls", passive_deletes=True)
     pos: Mapped[int] = mapped_column(Integer(), nullable=False)
     index: Mapped[int] = mapped_column(Integer(), nullable=False, default=0)
     status: Mapped[Status] = mapped_column(ENUM(Status), default=Status.PENDING, nullable=False, index=True)
 
-    __table_args__ = (Index("uix_job_function_call", 'job_id', "pos", unique=True),)
+    __table_args__ = (Index("uix_job_function_call", "job_id", "pos", unique=True),)
 
 
 class Thread(Base):
@@ -61,7 +61,7 @@ class Thread(Base):
     __tablename__ = "threads"
 
     id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)
-    job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id", ondelete='CASCADE'), nullable=False, index=True)
+    job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id", ondelete="CASCADE"), nullable=False, index=True)
     job: Mapped["Job"] = relationship(back_populates="threads", passive_deletes=True)
     name: Mapped[str] = mapped_column(String(), nullable=False)
 
@@ -71,7 +71,7 @@ class Thread(Base):
         ENUM(ThreadStatus), default=ThreadStatus.OPEN, nullable=False, index=True
     )
 
-    __table_args__ = (Index("uix_job_thread", 'job_id', "name", unique=True),)
+    __table_args__ = (Index("uix_job_thread", "job_id", "name", unique=True),)
 
 
 class Request(Base):
@@ -80,7 +80,7 @@ class Request(Base):
     __tablename__ = "requests"
 
     id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)
-    object_id: Mapped[int] = mapped_column(ForeignKey("objects.id", ondelete='CASCADE'), nullable=False, unique=True)
+    object_id: Mapped[int] = mapped_column(ForeignKey("objects.id", ondelete="CASCADE"), nullable=False, unique=True)
     object: Mapped["Object"] = relationship(back_populates="request", passive_deletes=True)
 
     operator_name: Mapped[str] = mapped_column(String(), nullable=False, index=True)

@@ -2,7 +2,12 @@ from unittest.mock import Mock, patch
 
 from sagery.api import app
 from sagery.enums import Mode
-from sagery.main import main
+from sagery.main import main, read_list_from_json_file
+
+
+def test_read_list_from_json_file():  # noqa: D103
+    jobs = read_list_from_json_file("tests/data/jobs.json")
+    assert jobs == ["tests/example/jobs:ExampleJob"]
 
 
 @patch("sagery.main.collect_all")
@@ -12,7 +17,7 @@ from sagery.main import main
 @patch(
     "sagery.main.argparse.ArgumentParser",
     return_value=Mock(
-        parse_args=Mock(return_value=Mock(mode='web')),
+        parse_args=Mock(return_value=Mock(mode="web")),
     ),
 )
 def test_main_web(  # noqa: D103
@@ -21,7 +26,7 @@ def test_main_web(  # noqa: D103
     main()
 
     argument_parser_mock.assert_called_once()
-    argument_parser_mock.return_value.add_argument.assert_called_once_with('mode', help='mode', choices=Mode)
+    argument_parser_mock.return_value.add_argument.assert_called_once_with("mode", help="mode", choices=Mode)
     argument_parser_mock.return_value.parse_args.assert_called_once_with()
 
     settings_mock.assert_called_once_with()
@@ -46,7 +51,7 @@ def test_main_web(  # noqa: D103
 @patch(
     "sagery.main.argparse.ArgumentParser",
     return_value=Mock(
-        parse_args=Mock(return_value=Mock(mode='core')),
+        parse_args=Mock(return_value=Mock(mode="core")),
     ),
 )
 def test_main_core(  # noqa: D103
@@ -55,7 +60,7 @@ def test_main_core(  # noqa: D103
     main()
 
     argument_parser_mock.assert_called_once()
-    argument_parser_mock.return_value.add_argument.assert_called_once_with('mode', help='mode', choices=Mode)
+    argument_parser_mock.return_value.add_argument.assert_called_once_with("mode", help="mode", choices=Mode)
     argument_parser_mock.return_value.parse_args.assert_called_once_with()
 
     run_mock.assert_called_once_with()
