@@ -1,0 +1,133 @@
+[tool.poetry]
+name = "sagery"
+version = "0.1.0"
+description = ""
+authors = ["Dmitriy Shikhalev <dmitriy.shikhalev@gmail.com>"]
+license = "BSD 3-Clause License"
+readme = "README.md"
+packages = [{ include = "sagery" }]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+sqlalchemy = "^2.0.29"
+alembic = "^1.13.1"
+pydantic = "^2.9.1"
+pydantic-settings = "^2.4.0"
+fastapi = "^0.114.0"
+uvicorn = "^0.30.6"
+psycopg2 = "^2.9.9"
+pytest-asyncio = "^0.24.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.1.1"
+poetry = "^1.8.2"
+mypy = "^1.9.0"
+pytest-coverage = "^0.0"
+pytest-mypy = "^0.10.3"
+httpx = "^0.27.0"
+pytest-isort = "^4.0.0"
+pytest-asyncio = "^0.24.0"
+pyenchant = "^3.2.2"
+black = "^24.10.0"
+ruff = "^0.6.9"
+pre-commit = "^4.0.1"
+pytest-black = "^0.3.12"
+pytest-ruff = "^0.4.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+sagery = "sagery.main:main"
+
+[tool.black]
+line-length = 120
+target-version = ['py312']
+include = '\.pyi?$'
+
+[tool.ruff]
+# Same as Black.
+line-length = 120
+cache-dir = "~/.cache/ruff"
+include = ["sagery/*", "tests/*"]
+exclude = [".venv", "alembic"]
+# Assume Python 3.12
+target-version = "py312"
+
+# Allow autofix for all enabled rules (when `--fix`) is provided.
+lint.fixable = ["ALL"]
+lint.unfixable = []
+
+lint.select = [
+    "D",  # docstrings
+    "E",  # pycodestyle errors (settings from FastAPI, thanks, @tiangolo!)
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "C",  # flake8-comprehensions
+    "B",  # flake8-bugbear
+]
+lint.ignore = [
+    "E501",  # line too long, handled by black
+    "W292",  # no new line at end of file, handled by black
+    "C901",  # too complex
+    "D100",  # Missing docstring in public module
+]
+
+[tool.ruff.lint.flake8-quotes]
+docstring-quotes = "double"
+
+[tool.ruff.format]
+# Like Black, use double quotes for strings.
+quote-style = "double"
+
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
+
+# Like Black, respect magic trailing commas.
+skip-magic-trailing-comma = false
+
+# Like Black, automatically detect the appropriate line ending.
+line-ending = "auto"
+
+# Enable auto-formatting of code examples in docstrings. Markdown,
+# reStructuredText code/literal blocks and doctests are all supported.
+#
+# This is currently disabled by default, but it is planned for this
+# to be opt-out in the future.
+docstring-code-format = false
+
+# Set the line length limit used when formatting code snippets in
+# docstrings.
+#
+# This only has an effect when the `docstring-code-format` setting is
+# enabled.
+docstring-code-line-length = "dynamic"
+
+[tool.ruff.lint.isort]
+order-by-type = true
+relative-imports-order = "closest-to-furthest"
+extra-standard-library = ["typing"]
+section-order = ["future", "standard-library", "third-party", "first-party", "local-folder"]
+known-first-party = []
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+filterwarnings = [
+    "error",
+    "ignore::UserWarning",
+    # note the use of single quote below to denote "raw" strings in TOML
+    'ignore:function ham\(\) is deprecated:DeprecationWarning',
+]
+asyncio_default_fixture_loop_scope = "function"
+addopts = "-vvv --mypy --black --ruff --cov=sagery --no-cov-on-fail --cov-report term-missing"
+testpaths = [
+    "sagery", "tests",
+]
+
+[[tool.mypy.overrides]]
+module = "sagery.*"
+
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = ["fastapi.Depends", "fastapi.params.Depends", "fastapi.Query", "fastapi.params.Query"]
