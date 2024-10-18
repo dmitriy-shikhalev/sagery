@@ -120,6 +120,7 @@ filterwarnings = [
     # note the use of single quote below to denote "raw" strings in TOML
     'ignore:function ham\(\) is deprecated:DeprecationWarning',
 ]
+asyncio_default_fixture_loop_scope = "function"
 addopts = "-vvv --mypy --black --ruff --cov=sagery --no-cov-on-fail --cov-report term-missing"
 testpaths = [
     "tests",
