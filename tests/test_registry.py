@@ -14,4 +14,4 @@ def test_class_registry():  # noqa: D103
 
 
 def test_collect_all():  # noqa: D103
-    registry.collect_all([], [])
+    registry.collect_all(["tests/example/jobs:ExampleJob"], [])
