@@ -8,7 +8,15 @@ client = TestClient(app)
 
 def test_create_job_not_found():
     """Test creating a job by POST /sagas/<job_name>/ with result "not found"."""
-    test_job_name = "not_existed_saga_name"
-    response = client.post(f"/sagas/{test_job_name}/", json={"name": test_job_name})
+    test_saga_name = "not_existed_saga_name"
+    response = client.post(f"/sagas/{test_saga_name}/")
 
     assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+def test_create_job_ok():
+    """Test creating a job by POST /sagas/<job_name>/ with result "not found"."""
+    test_saga_name = "test_saga_name"
+    response = client.post(f"/sagas/{test_saga_name}/")
+
+    assert response.status_code == status.HTTP_201_CREATED
