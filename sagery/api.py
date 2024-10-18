@@ -23,6 +23,8 @@ async def create_job(name: str, session: Session = Depends(get_session)):
     for thread in saga.threads:
         await thread_repository.create(job_id=job.id, name=thread.name, accounted=thread.accounted)
 
+    raise NotImplementedError  # todo: create all FunctionCalls
+
     session.commit()
     return job.id
 

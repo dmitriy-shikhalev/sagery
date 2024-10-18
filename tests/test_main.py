@@ -6,8 +6,8 @@ from sagery.main import main, read_list_from_json_file
 
 
 def test_read_list_from_json_file():  # noqa: D103
-    jobs = read_list_from_json_file("tests/data/jobs.json")
-    assert jobs == ["tests/example/jobs:ExampleJob"]
+    jobs = read_list_from_json_file("tests/data/sagas.json")
+    assert jobs == ["tests.example.sagas:ExampleSaga"]
 
 
 @patch("sagery.main.collect_all")

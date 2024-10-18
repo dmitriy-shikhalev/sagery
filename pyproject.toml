@@ -123,7 +123,7 @@ filterwarnings = [
 asyncio_default_fixture_loop_scope = "function"
 addopts = "-vvv --mypy --black --ruff --cov=sagery --no-cov-on-fail --cov-report term-missing"
 testpaths = [
-    "tests",
+    "sagery", "tests",
 ]
 
 [[tool.mypy.overrides]]

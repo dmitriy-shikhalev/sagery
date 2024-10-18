@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from sagery.db import get_session
 from sagery.main import app
 from sagery.models import Job
+from sagery.registry import collect_all
 from sagery.repositories import JobRepository
 
 
@@ -44,3 +45,9 @@ async def job(test_session: Session) -> AsyncGenerator[Job, None]:
     """Job fixture."""
     job_ = await JobRepository(test_session).create(a="b")
     yield job_
+
+
+@fixture()
+async def example() -> None:
+    """Example job and operator fixture."""  # noqa: D401
+    collect_all(["tests.example.sagas:ExampleSaga"], ["tests.example.operators:ExampleOperator"])
