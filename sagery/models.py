@@ -49,7 +49,6 @@ class FunctionCall(Base):
     job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id", ondelete='CASCADE'), nullable=False, index=True)
     job: Mapped["Job"] = relationship(back_populates="function_calls", passive_deletes=True)
     pos: Mapped[int] = mapped_column(Integer(), nullable=False)
-    # name: Mapped[str] = mapped_column(String(), nullable=False)  # todo: is it needed?
     index: Mapped[int] = mapped_column(Integer(), nullable=False, default=0)
     status: Mapped[Status] = mapped_column(ENUM(Status), default=Status.PENDING, nullable=False, index=True)
 
@@ -65,8 +64,6 @@ class Thread(Base):
     job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id", ondelete='CASCADE'), nullable=False, index=True)
     job: Mapped["Job"] = relationship(back_populates="threads", passive_deletes=True)
     name: Mapped[str] = mapped_column(String(), nullable=False)
-    # accounted: Mapped[bool] = mapped_column(Boolean(), nullable=False)  # todo: is it needed?
-    # managed: Mapped[bool] = mapped_column(Boolean(), nullable=False)  # todo: is it needed?
 
     objects: Mapped[list[Object]] = relationship(Object, back_populates="thread")
 
@@ -75,21 +72,6 @@ class Thread(Base):
     )
 
     __table_args__ = (Index("uix_job_thread", 'job_id', "name", unique=True),)
-
-
-# class FunctionCallThread(Base):  # todo: is it needed?
-#     """
-#     Class for representing many-to-many relationship between threads and function_calls.
-#     """
-#     __tablename__ = "function_call_thread"
-#
-#     id: Mapped[int] = mapped_column(Integer(), init=False, primary_key=True)
-#     function_call_id = mapped_column(ForeignKey("function_calls.id", ondelete='CASCADE'), nullable=False)
-#     thread_id = mapped_column(ForeignKey("threads.id", ondelete='CASCADE'), nullable=False)
-#
-#     __table_args__ = (
-#         Index("uix_function_call_thread", 'function_call_id', "thread_id", unique=True),
-#     )
 
 
 class Request(Base):
