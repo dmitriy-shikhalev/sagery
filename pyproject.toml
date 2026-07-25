@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "sagery"
+version = "0.1.0"
+description = ""
+authors = ["Dmitriy Shikhalev <dmitriy.shikhalev@xmail.ru>"]
+license = "BSD-3"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.13"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.poetry.scripts]
+sagery = "sagery.main:main"
