@@ -2,7 +2,7 @@ import asyncio
 import sys
 
 
-async def async_sum_nums(args):
+async def async_sum_nums(args: list[str]) -> int:
     return sum(map(int, args))
 
 
@@ -11,7 +11,7 @@ operators = {
 }
 
 
-def main():
+def main() -> None:
     if len(sys.argv) < 2:
         raise RuntimeError("Use: `sagery sum 1 2`")
     else:
