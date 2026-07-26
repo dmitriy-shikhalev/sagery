@@ -9,4 +9,4 @@ class Saga(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(CHAR(50), nullable=True, index=True)
-    comments: Mapped[str] = mapped_column(TEXT(1024), nullable=True)
+    comment: Mapped[str] = mapped_column(TEXT(), nullable=True)
