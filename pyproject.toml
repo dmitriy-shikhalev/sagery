@@ -6,8 +6,9 @@ authors = ["Dmitriy Shikhalev <dmitriy.shikhalev@xmail.ru>"]
 license = "BSD-3"
 readme = "README.md"
 packages = [
-    { include = "sagery", from = "sagery" }
+    { include = "sagery" }
 ]
+package-mode = true
 
 [tool.poetry.dependencies]
 python = "^3.13"
@@ -15,6 +16,8 @@ fastapi = "^0.140.0"
 uvicorn = "^0.51.0"
 sqlalchemy = "^2.0.51"
 alembic = "^1.18.5"
+pydantic = "^2.13.4"
+pydantic-settings = "^2.14.2"
 
 
 [tool.poetry.group.dev.dependencies]

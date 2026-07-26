@@ -1,24 +1,7 @@
-import asyncio
-import sys
+import uvicorn
 
-
-async def async_sum_nums(args: list[str]) -> int:
-    return sum(map(int, args))
-
-
-operators = {
-    "sum": async_sum_nums,
-}
+from sagery.api.app import app
 
 
 def main() -> None:
-    if len(sys.argv) < 2:
-        raise RuntimeError("Use: `sagery sum 1 2`")
-    else:
-        operator_name = sys.argv[1]
-        operator = operators.get(operator_name)
-        if operator is None:
-            raise RuntimeError(f"There is no operator `{operator_name}`")
-
-        result = asyncio.run(operator(sys.argv[2:]))
-        print(f"Result is {result}")
+    uvicorn.run(app, host="localhost", port=8000)
