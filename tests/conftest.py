@@ -1,12 +1,10 @@
-from typing import Generator
-
 import pytest
 from alembic import command
 from alembic.config import Config
 
 
 @pytest.fixture(scope="session", autouse=True)
-def migrate_database() -> Generator:
+def migrate_database():
     # 1. Путь к конфигурации Alembic
     alembic_cfg = Config("alembic.ini")
 
