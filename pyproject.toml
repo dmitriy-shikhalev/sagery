@@ -38,6 +38,10 @@ sagery = "sagery.main:main"
 
 [tool.ruff]
 line-length = 120  # Если вам нужна была кастомная длина строки
+exclude = [
+    "migrations",
+    "venv",
+]
 
 [tool.ruff.format]
 quote-style = "double"  # Стиль кавычек по умолчанию, как в Black
@@ -49,7 +53,7 @@ ignore = []
 
 [tool.pytest.ini_options]
 # --ruff запускает линтер, --ruff-format проверяет форматирование
-addopts = "-vv --ruff --ruff-format --mypy"
+addopts = "-vv --ruff --ruff-format --mypy --cov=sagery/ --cov-report=term-missing --cov-fail-under=80"
 
 [tool.mypy]
 # Минимальная поддерживаемая версия Python
@@ -73,8 +77,10 @@ show_error_codes = true
 # Игнорировать ошибки импорта для библиотек без встроенных типов
 ignore_missing_imports = true
 
+
 [[tool.mypy.overrides]]
 module = [
     "requests.*",
+    "migrations.*"
 ]
 ignore_missing_imports = true

@@ -1,3 +1,5 @@
+# mypy: ignore-errors
+
 import asyncio
 from logging.config import fileConfig
 
