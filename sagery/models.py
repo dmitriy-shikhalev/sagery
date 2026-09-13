@@ -1,8 +1,12 @@
-from sqlalchemy import CHAR, TEXT, ForeignKey
+from datetime import datetime
+from typing import Any
+
+from sqlalchemy import CHAR, TEXT, Boolean, Column, DateTime, ForeignKey, String, Table, UniqueConstraint, func
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from sagery.db.base import Base
+from sagery.enums import JobStatus, LaunchStatus
 
 
 # Block Schema
@@ -12,28 +16,116 @@ class Saga(Base):
     __tablename__ = "sagas"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(CHAR(50), nullable=True, index=True)
+    name: Mapped[str] = mapped_column(CHAR(50), nullable=True, unique=True)
     comment: Mapped[str] = mapped_column(TEXT(), nullable=True)
+    
     queues: Mapped[list["Queue"]] = relationship(back_populates="saga")
+    operators: Mapped[list["Operator"]] = relationship(back_populates="saga")
+    jobs: Mapped[list["Job"]] = relationship(back_populates="saga")
 
 
 class Queue(Base):
     __tablename__ = "queues"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    saga_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    saga_id: Mapped[int] = mapped_column(ForeignKey("sagas.id"), nullable=False)
     name: Mapped[str] = mapped_column(CHAR(50), nullable=False, index=True)
+
     saga: Mapped["Saga"] = relationship(back_populates="queues")
+
+
+operator_input_queue_table = Table(
+    "operator_input_queue",
+    Base.metadata,
+    Column("operator_id", ForeignKey("operators.id", ondelete="CASCADE"), primary_key=True),
+    Column("queue_id", ForeignKey("queues.id", ondelete="CASCADE"), primary_key=True),
+)
+
+
+operator_output_queue_table = Table(
+    "operator_output_queue",
+    Base.metadata,
+    Column("operator_id", ForeignKey("operators.id", ondelete="CASCADE"), primary_key=True),
+    Column("queue_id", ForeignKey("queues.id", ondelete="CASCADE"), primary_key=True),
+)
 
 
 class Operator(Base):
     __tablename__ = "operators"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    saga_id: Mapped[int] = mapped_column(ForeignKey("sagas.id"), nullable=False)
     name: Mapped[str] = mapped_column(CHAR(50), nullable=False, index=True)
-    args_mapper: Mapped[dict[str, str]] = mapped_column(JSONB(), nullable=False, server_default="{}")
+
+    saga: Mapped[Saga] = relationship(back_populates="queues")
+    inputs: Mapped[list[Queue]] = relationship(secondary=operator_input_queue_table, back_populates="operators")
+    outputs: Mapped[list[Queue]] = relationship(secondary=operator_output_queue_table, back_populates="operators")
+
+
+class Input(Base):
+    __tablename__ = "inputs"
+    __table_args__ = (
+        UniqueConstraint("saga_id", "queue_id", name="uq_inputs"),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    saga_id: Mapped[int] = mapped_column(ForeignKey("sagas.id"), nullable=False)
+    queue_id: Mapped[int] = mapped_column(ForeignKey("queues.id"), nullable=False)
+
+    operators: Mapped[list[Operator]] = relationship(secondary=operator_input_queue_table, back_populates="inputs")
+
+
+class Output(Base):
+    __tablename__ = "outputs"
+    __table_args__ = (
+        UniqueConstraint("saga_id", "queue_id", name="uq_outputs"),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    saga_id: Mapped[int] = mapped_column(ForeignKey("sagas.id"), nullable=False)
+    queue_id: Mapped[int] = mapped_column(ForeignKey("queues.id"), nullable=False)
+
+    operators: Mapped[list[Operator]] = relationship(secondary=operator_input_queue_table, back_populates="outputs")
 
 
 # Block jobs
 
 
+class Job(Base):
+    __tablename__ = "jobs"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    saga_id: Mapped[int] = mapped_column(ForeignKey("sagas.id"), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(), server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(DateTime(), server_default=func.now(), onupdate=func.now())
+    comment: Mapped[str] = mapped_column(TEXT(), nullable=True)
+    status: Mapped[JobStatus] = mapped_column(String(10), nullable=False, default=JobStatus.PREPARING)
+
+    saga: Mapped["Saga"] = relationship(back_populates="jobs")
+    streams: Mapped[list["Stream"]] = relationship(back_populates="job")
+
+
+class Stream(Base):
+    __tablename__ = "streams"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id"), nullable=False)
+    done: Mapped[bool] = mapped_column(Boolean(), default=False, nullable=False)
+
+
+class Value(Base):
+    __tablename__ = "values"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    stream_id: Mapped[int] = mapped_column(ForeignKey("streams.id"), nullable=False)
+    data: Mapped[Any] = mapped_column(JSONB(), nullable=False)
+    done: Mapped[bool] = mapped_column(Boolean(), default=False, nullable=False)
+
+
+class Launch(Base):
+    __tablename__ = "launches"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id"), nullable=False)
+    operator_id: Mapped[int] = mapped_column(ForeignKey("operators.id"), nullable=False)
+    status: Mapped[LaunchStatus] = mapped_column(String(10), nullable=False, default=LaunchStatus.PROCESSING)
