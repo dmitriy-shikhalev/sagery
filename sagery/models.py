@@ -103,6 +103,7 @@ class Job(Base):
 
     saga: Mapped["Saga"] = relationship(back_populates="jobs")
     streams: Mapped[list["Stream"]] = relationship(back_populates="job")
+    launches: Mapped[list["Launch"]] = relationship(back_populates="job")
 
 
 class Stream(Base):
@@ -112,14 +113,21 @@ class Stream(Base):
     job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id"), nullable=False)
     done: Mapped[bool] = mapped_column(Boolean(), default=False, nullable=False)
 
+    job: Mapped["Job"] = relationship(back_populates="streams")
+    values: Mapped[list["Stream"]] = relationship(back_populates="stream")
+
 
 class Value(Base):
     __tablename__ = "values"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     stream_id: Mapped[int] = mapped_column(ForeignKey("streams.id"), nullable=False)
+    launch_id: Mapped[int] = mapped_column(ForeignKey("launches.id"), nullable=False)
     data: Mapped[Any] = mapped_column(JSONB(), nullable=False)
     done: Mapped[bool] = mapped_column(Boolean(), default=False, nullable=False)
+
+    stream: Mapped["Stream"] = relationship(back_populates="values")
+    launch: Mapped["Launch"] = relationship(back_populates="values")
 
 
 class Launch(Base):
@@ -129,3 +137,7 @@ class Launch(Base):
     job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id"), nullable=False)
     operator_id: Mapped[int] = mapped_column(ForeignKey("operators.id"), nullable=False)
     status: Mapped[LaunchStatus] = mapped_column(String(10), nullable=False, default=LaunchStatus.PROCESSING)
+
+    job: Mapped["Job"] = relationship(back_populates="launches")
+    operator: Mapped["Operator"] = relationship(back_populates="launches")
+    values: Mapped[list["Value"]] = relationship(back_populates="launch")
