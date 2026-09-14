@@ -6,7 +6,7 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from sagery.db.base import Base
-from sagery.enums import JobStatus, LaunchStatus
+from sagery.enums import Status
 
 
 # Block Schema
@@ -18,7 +18,7 @@ class Saga(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(CHAR(50), nullable=True, unique=True)
     comment: Mapped[str] = mapped_column(TEXT(), nullable=True)
-    
+
     queues: Mapped[list["Queue"]] = relationship(back_populates="saga")
     operators: Mapped[list["Operator"]] = relationship(back_populates="saga")
     jobs: Mapped[list["Job"]] = relationship(back_populates="saga")
@@ -26,6 +26,9 @@ class Saga(Base):
 
 class Queue(Base):
     __tablename__ = "queues"
+    __table_args__ = (
+        UniqueConstraint("saga_id", "name", name="uq_queue"),
+    )
 
     id: Mapped[int] = mapped_column(primary_key=True)
     saga_id: Mapped[int] = mapped_column(ForeignKey("sagas.id"), nullable=False)
@@ -99,7 +102,7 @@ class Job(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime(), server_default=func.now(), onupdate=func.now())
     comment: Mapped[str] = mapped_column(TEXT(), nullable=True)
-    status: Mapped[JobStatus] = mapped_column(String(10), nullable=False, default=JobStatus.PREPARING)
+    status: Mapped[Status] = mapped_column(String(10), nullable=False, default=Status.PREPARING, index=True)
 
     saga: Mapped["Saga"] = relationship(back_populates="jobs")
     streams: Mapped[list["Stream"]] = relationship(back_populates="job")
@@ -111,7 +114,7 @@ class Stream(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id"), nullable=False)
-    done: Mapped[bool] = mapped_column(Boolean(), default=False, nullable=False)
+    done: Mapped[bool] = mapped_column(Boolean(), default=False, nullable=False, index=True)
 
     job: Mapped["Job"] = relationship(back_populates="streams")
     values: Mapped[list["Stream"]] = relationship(back_populates="stream")
@@ -124,7 +127,7 @@ class Value(Base):
     stream_id: Mapped[int] = mapped_column(ForeignKey("streams.id"), nullable=False)
     launch_id: Mapped[int] = mapped_column(ForeignKey("launches.id"), nullable=False)
     data: Mapped[Any] = mapped_column(JSONB(), nullable=False)
-    done: Mapped[bool] = mapped_column(Boolean(), default=False, nullable=False)
+    done: Mapped[bool] = mapped_column(Boolean(), default=False, nullable=False, index=True)
 
     stream: Mapped["Stream"] = relationship(back_populates="values")
     launch: Mapped["Launch"] = relationship(back_populates="values")
@@ -136,7 +139,7 @@ class Launch(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id"), nullable=False)
     operator_id: Mapped[int] = mapped_column(ForeignKey("operators.id"), nullable=False)
-    status: Mapped[LaunchStatus] = mapped_column(String(10), nullable=False, default=LaunchStatus.PROCESSING)
+    status: Mapped[Status] = mapped_column(String(10), nullable=False, default=Status.PREPARING, index=True)
 
     job: Mapped["Job"] = relationship(back_populates="launches")
     operator: Mapped["Operator"] = relationship(back_populates="launches")
