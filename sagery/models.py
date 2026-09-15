@@ -35,6 +35,7 @@ class Queue(Base):
     name: Mapped[str] = mapped_column(CHAR(50), nullable=False, index=True)
 
     saga: Mapped["Saga"] = relationship(back_populates="queues")
+    streams: Mapped[list["Stream"]] = relationship(back_populates="queues")
 
 
 operator_input_queue_table = Table(
@@ -68,11 +69,11 @@ class Operator(Base):
 class Input(Base):
     __tablename__ = "inputs"
     __table_args__ = (
-        UniqueConstraint("saga_id", "queue_id", name="uq_inputs"),
+        UniqueConstraint("operator_id", "queue_id", name="uq_inputs"),
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    saga_id: Mapped[int] = mapped_column(ForeignKey("sagas.id"), nullable=False)
+    operator_id: Mapped[int] = mapped_column(ForeignKey("sagas.id"), nullable=False)
     queue_id: Mapped[int] = mapped_column(ForeignKey("queues.id"), nullable=False)
 
     operators: Mapped[list[Operator]] = relationship(secondary=operator_input_queue_table, back_populates="inputs")
@@ -81,11 +82,11 @@ class Input(Base):
 class Output(Base):
     __tablename__ = "outputs"
     __table_args__ = (
-        UniqueConstraint("saga_id", "queue_id", name="uq_outputs"),
+        UniqueConstraint("operator_id", "queue_id", name="uq_outputs"),
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    saga_id: Mapped[int] = mapped_column(ForeignKey("sagas.id"), nullable=False)
+    operator_id: Mapped[int] = mapped_column(ForeignKey("sagas.id"), nullable=False)
     queue_id: Mapped[int] = mapped_column(ForeignKey("queues.id"), nullable=False)
 
     operators: Mapped[list[Operator]] = relationship(secondary=operator_input_queue_table, back_populates="outputs")
@@ -114,9 +115,11 @@ class Stream(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id"), nullable=False)
+    queue_id: Mapped[int] = mapped_column(ForeignKey("queues.id"), nullable=False)
     done: Mapped[bool] = mapped_column(Boolean(), default=False, nullable=False, index=True)
 
     job: Mapped["Job"] = relationship(back_populates="streams")
+    queue: Mapped["Queue"] = relationship(back_populates="streams")
     values: Mapped[list["Stream"]] = relationship(back_populates="stream")
 
 
