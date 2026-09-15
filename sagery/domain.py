@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import TypeAlias
 
 from sagery.enums import Status
 
@@ -6,34 +7,23 @@ from sagery.enums import Status
 # Block schema
 
 
-@dataclass
-class Input:
-    name: str
-
-
-@dataclass
-class Output:
-    name: str
+type QueueName = str
+type OperatorName = str
 
 
 @dataclass
 class Operator:
     name: str
-    inputs: list[Input]
-    outputs: list[Output]
-
-
-@dataclass
-class Queue:
-    name: str
+    inputs: set[QueueName]
+    outputs: set[QueueName]
 
 
 @dataclass
 class Saga:
     id: int
     name: str
-    operators: list[Operator]
-    queues: list[Queue]
+    operators: dict[OperatorName, Operator]
+    queues: set[QueueName]
 
 
 # Block jobs
@@ -42,7 +32,7 @@ class Saga:
 @dataclass
 class Launch:
     id: int
-    operator: str
+    operator: OperatorName
     status: Status
 
 
@@ -54,7 +44,7 @@ class Value:
 
 @dataclass
 class Stream:
-    name: str
+    name: QueueName
     values: list[Value]
     done: bool
 
@@ -62,6 +52,6 @@ class Stream:
 @dataclass
 class Job:
     saga_id: int
-    streams: list[Stream]
-    launches: list[Launch]
+    streams: dict[QueueName, Stream]
+    launches: dict[OperatorName, Launch]
     status: Status
