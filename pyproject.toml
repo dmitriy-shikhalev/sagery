@@ -1,0 +1,110 @@
+[tool.poetry]
+name = "sagery"
+version = "0.1.0"
+description = ""
+authors = ["Dmitriy Shikhalev <dmitriy.shikhalev@xmail.ru>"]
+license = "BSD-3"
+readme = "README.md"
+packages = [
+    { include = "sagery" }
+]
+package-mode = true
+
+[tool.poetry.dependencies]
+python = "^3.13"
+fastapi = "^0.140.0"
+uvicorn = "^0.51.0"
+sqlalchemy = "^2.0.51"
+alembic = "^1.18.5"
+pydantic = "^2.13.4"
+pydantic-settings = "^2.14.2"
+asyncpg = "^0.31.0"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^9.1.1"
+pytest-mypy = "^1.0.1"
+pytest-ruff = "^0.5"
+pytest-coverage = "^0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.poetry.scripts]
+sagery = "sagery.main:main"
+
+
+[tool.ruff]
+line-length = 120  # Если вам нужна была кастомная длина строки
+exclude = [
+    "migrations",
+    "venv",
+]
+target-version = "py313"
+
+[tool.ruff.format]
+quote-style = "double"  # Стиль кавычек по умолчанию, как в Black
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle (ошибки стиля)
+    "W",   # pycodestyle (предупреждения стиля)
+    "F",   # Pyflakes (поиск багов, неиспользуемый импорт/переменные)
+    "I",   # isort (автоматическая сортировка импортов)
+    "B",   # flake8-bugbear (поиск неочевидных багов и кривого кода)
+    "C4",  # flake8-comprehensions (оптимизация list/dict comprehensions)
+    "UP",  # pyupgrade (обновление синтаксиса до актуальной версии Python)
+]
+ignore = []
+
+[tool.ruff.lint.per-file-ignores]
+"migrations/*" = ["E402", "F401"] # разрешить импорты не в начале файла и неиспользуемые импорты
+
+[tool.pytest.ini_options]
+# --ruff запускает линтер, --ruff-format проверяет форматирование
+addopts = "-vv --ruff --ruff-format --mypy --cov=sagery/ --cov-report=term-missing --cov-fail-under=80 --no-cov-on-fail"
+
+[tool.mypy]
+# Минимальная поддерживаемая версия Python
+python_version = "3.13"
+
+# Запрещает вызов функций без аннотаций типов из функций с аннотациями
+disallow_untyped_calls = true
+
+# Запрещает определять функции без аннотаций типов
+disallow_untyped_defs = true
+
+# Требует явной обработки None (например, Optional[int] вместо int = None)
+no_implicit_optional = true
+
+# Предупреждает о возврате Any из функции, где заявлен конкретный тип
+warn_return_any = true
+
+# Показывать коды ошибок в выводе терминала (нужно для выборочного игнорирования)
+show_error_codes = true
+
+# Игнорировать ошибки импорта для библиотек без встроенных типов
+ignore_missing_imports = true
+
+
+[[tool.mypy.overrides]]
+module = [
+    "requests.*",
+    "migrations.*",
+]
+ignore_missing_imports = true
+
+
+[[tool.mypy.overrides]]
+module = [
+    "conftest",
+    "tests.*"
+]
+# Разрешает определять функции без аннотаций типов
+disallow_untyped_defs = false
+# Разрешает определять частично типизированные функции
+disallow_incomplete_defs = false
+# Не выдает ошибку, если вы вызываете нетипизированную функцию внутри теста
+check_untyped_defs = false
