@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import TypeAlias
+from typing import Any
 
 from sagery.enums import Status
 
@@ -61,13 +61,3 @@ class Job:
 class App:
     sagas: dict[str, Saga] = field(default_factory=dict)
     jobs: dict[int, Job] = field(default_factory=dict)
-
-    def add_saga(self, saga: Saga):
-        if saga.name in self.sagas:
-            raise ValueError(f"Adding the same saga {saga.name}")
-        self.sagas[saga.name] = saga
-
-    def add_job(self, job: Job):
-        if job.id in self.jobs:
-            raise ValueError(f"Adding the same job {job.id}")
-        self.jobs[job.id] = job
