@@ -5,7 +5,7 @@ from sqlalchemy import CHAR, TEXT, Boolean, Column, DateTime, ForeignKey, String
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from sagery.db.base import Base
+from sagery.db import Base
 from sagery.enums import Status
 
 # Block Schema

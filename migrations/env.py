@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from alembic import context
 
 # 1. Импортируем ваши Base и модели (как настроили ранее)
-from sagery.db.base import Base
+from sagery.db import Base
 import sagery.models
 
 # Объект конфигурации Alembic, предоставляющий доступ к значениям из alembic.ini

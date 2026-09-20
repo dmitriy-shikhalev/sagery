@@ -1,6 +1,9 @@
 import pytest
 from alembic import command
 from alembic.config import Config
+from sqlalchemy.ext.asyncio import create_async_engine
+
+from sagery.settings import Settings
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -13,3 +16,19 @@ def migrate_database():
 
     # Передаем управление тестам
     yield
+
+
+@pytest.fixture(scope="session")
+async def settings():
+    return Settings()
+
+
+@pytest.fixture(scope="session")
+async def engine(settings):
+    async with create_async_engine(url=settings.postgres.url.unicode_string()):
+        pass
+
+
+@pytest.fixture()
+def session():
+    pass
