@@ -3,7 +3,6 @@ from typing import Any
 
 from sagery.enums import Status
 
-
 # Block schema
 
 

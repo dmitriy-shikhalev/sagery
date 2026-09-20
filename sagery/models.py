@@ -8,7 +8,6 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sagery.db.base import Base
 from sagery.enums import Status
 
-
 # Block Schema
 
 
@@ -26,9 +25,7 @@ class Saga(Base):
 
 class Queue(Base):
     __tablename__ = "queues"
-    __table_args__ = (
-        UniqueConstraint("saga_id", "name", name="uq_queue"),
-    )
+    __table_args__ = (UniqueConstraint("saga_id", "name", name="uq_queue"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
     saga_id: Mapped[int] = mapped_column(ForeignKey("sagas.id"), nullable=False)
@@ -68,9 +65,7 @@ class Operator(Base):
 
 class Input(Base):
     __tablename__ = "inputs"
-    __table_args__ = (
-        UniqueConstraint("operator_id", "queue_id", name="uq_inputs"),
-    )
+    __table_args__ = (UniqueConstraint("operator_id", "queue_id", name="uq_inputs"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
     operator_id: Mapped[int] = mapped_column(ForeignKey("sagas.id"), nullable=False)
@@ -81,9 +76,7 @@ class Input(Base):
 
 class Output(Base):
     __tablename__ = "outputs"
-    __table_args__ = (
-        UniqueConstraint("operator_id", "queue_id", name="uq_outputs"),
-    )
+    __table_args__ = (UniqueConstraint("operator_id", "queue_id", name="uq_outputs"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
     operator_id: Mapped[int] = mapped_column(ForeignKey("sagas.id"), nullable=False)
