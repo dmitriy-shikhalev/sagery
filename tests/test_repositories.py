@@ -1,4 +1,8 @@
+from unittest.mock import Mock
+
 import pytest
+from mypy.typeanal import Callable
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from sagery.repositories import AbstractRepository, SagaRepository
 
@@ -10,5 +14,7 @@ from sagery.repositories import AbstractRepository, SagaRepository
     ],
 )
 class TestRepository:
-    def test(self, klass: AbstractRepository) -> None:
-        pass
+    def test_init(self, klass: Callable[[AsyncSession], AbstractRepository]) -> None:
+        session = Mock()
+        repository = klass(session)
+        assert repository.session is session
