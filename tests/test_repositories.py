@@ -18,3 +18,8 @@ class TestRepository:
         session = Mock()
         repository = klass(session)
         assert repository.session is session
+
+    async def test_create(self, klass: Callable[[AsyncSession], AbstractRepository]) -> None:
+        session = Mock()
+        repository = klass(session)
+        await repository.create(a=1, b=2)

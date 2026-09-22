@@ -18,23 +18,23 @@ class AbstractRepository[Object: type[ModelClass], domain_model: type[DomainMode
     @property
     @abstractmethod
     def model(self) -> type[ModelClass]:
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     @property
     @abstractmethod
     def domain(self) -> type[DomainModel]:
+        raise NotImplementedError  # pragma: no cover
+
+    async def create(self, **kwargs: tuple[Any, Any]) -> Object:
         raise NotImplementedError
 
-    def create(self, **kwargs: Mapping[Any, Any]) -> Object:
+    async def get(self, id: int) -> Object:
         raise NotImplementedError
 
-    def get(self, id: int) -> Object:
+    async def update(self, id: int, **kwargs: Mapping[Any, Any]) -> Object:
         raise NotImplementedError
 
-    def update(self, id: int, **kwargs: Mapping[Any, Any]) -> Object:
-        raise NotImplementedError
-
-    def delete(self, id: int) -> Object:
+    async def delete(self, id: int) -> Object:
         raise NotImplementedError
 
 

@@ -26,6 +26,7 @@ pytest = "^9.1.1"
 pytest-mypy = "^1.0.1"
 pytest-ruff = "^0.5"
 pytest-coverage = "^0.0"
+pytest-asyncio = "^1.4.0"
 
 [build-system]
 requires = ["poetry-core"]
@@ -65,6 +66,7 @@ ignore = []
 [tool.pytest.ini_options]
 # --ruff запускает линтер, --ruff-format проверяет форматирование
 addopts = "-vv --ruff --ruff-format --mypy --cov=sagery/ --cov-report=term-missing --cov-fail-under=80 --no-cov-on-fail"
+asyncio_mode = "auto"
 
 [tool.mypy]
 # Минимальная поддерживаемая версия Python
