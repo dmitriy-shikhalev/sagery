@@ -25,8 +25,8 @@ class AbstractRepository[Object: type[ModelClass], domain_model: type[DomainMode
     def domain(self) -> type[DomainModel]:
         raise NotImplementedError  # pragma: no cover
 
-    async def create(self, **kwargs: tuple[Any, Any]) -> Object:
-        raise NotImplementedError
+    async def create(self, **kwargs: Any) -> Object:
+        self.session.add(self.model(**kwargs))
 
     async def get(self, id: int) -> Object:
         raise NotImplementedError

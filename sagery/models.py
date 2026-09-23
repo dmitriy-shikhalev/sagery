@@ -32,7 +32,9 @@ class Queue(Base):
     name: Mapped[str] = mapped_column(CHAR(50), nullable=False, index=True)
 
     saga: Mapped["Saga"] = relationship(back_populates="queues")
-    streams: Mapped[list["Stream"]] = relationship(back_populates="queues")
+    streams: Mapped[list["Stream"]] = relationship(back_populates="queue")
+    inputs: Mapped[list["Input"]] = relationship(back_populates="inputs")
+    outputs: Mapped[list["Output"]] = relationship(back_populates="outputs")
 
 
 operator_input_queue_table = Table(
@@ -58,7 +60,7 @@ class Operator(Base):
     saga_id: Mapped[int] = mapped_column(ForeignKey("sagas.id"), nullable=False)
     name: Mapped[str] = mapped_column(CHAR(50), nullable=False, index=True)
 
-    saga: Mapped[Saga] = relationship(back_populates="queues")
+    saga: Mapped[Saga] = relationship(back_populates="operators")
     inputs: Mapped[list[Queue]] = relationship(secondary=operator_input_queue_table, back_populates="operators")
     outputs: Mapped[list[Queue]] = relationship(secondary=operator_output_queue_table, back_populates="operators")
 
@@ -82,7 +84,7 @@ class Output(Base):
     operator_id: Mapped[int] = mapped_column(ForeignKey("sagas.id"), nullable=False)
     queue_id: Mapped[int] = mapped_column(ForeignKey("queues.id"), nullable=False)
 
-    operators: Mapped[list[Operator]] = relationship(secondary=operator_input_queue_table, back_populates="outputs")
+    operators: Mapped[list[Operator]] = relationship(secondary=operator_output_queue_table, back_populates="outputs")
 
 
 # Block jobs
