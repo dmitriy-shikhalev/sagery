@@ -22,4 +22,4 @@ class TestRepository:
     async def test_create(self, klass: Callable[[AsyncSession], AbstractRepository]) -> None:
         session = Mock()
         repository = klass(session)
-        await repository.create(a=1, b=2)
+        await repository.create(id=10**5, name="abc")

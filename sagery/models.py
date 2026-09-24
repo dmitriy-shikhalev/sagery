@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import CHAR, TEXT, Boolean, Column, DateTime, ForeignKey, String, Table, UniqueConstraint, func
+from sqlalchemy import CHAR, TEXT, Boolean, DateTime, ForeignKey, String, UniqueConstraint, func
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -23,22 +23,6 @@ class Saga(Base):
     jobs: Mapped[list["Job"]] = relationship(back_populates="saga")
 
 
-operator_input_queue_table = Table(
-    "operator_input_queue",
-    Base.metadata,
-    Column("operator_id", ForeignKey("operators.id", ondelete="CASCADE"), primary_key=True),
-    Column("queue_id", ForeignKey("queues.id", ondelete="CASCADE"), primary_key=True),
-)
-
-
-operator_output_queue_table = Table(
-    "operator_output_queue",
-    Base.metadata,
-    Column("operator_id", ForeignKey("operators.id", ondelete="CASCADE"), primary_key=True),
-    Column("queue_id", ForeignKey("queues.id", ondelete="CASCADE"), primary_key=True),
-)
-
-
 class Queue(Base):
     __tablename__ = "queues"
     __table_args__ = (UniqueConstraint("saga_id", "name", name="uq_queue"),)
@@ -51,8 +35,6 @@ class Queue(Base):
     streams: Mapped[list["Stream"]] = relationship(back_populates="queue")
     inputs: Mapped[list["Input"]] = relationship(back_populates="queue")
     outputs: Mapped[list["Output"]] = relationship(back_populates="queue")
-    input_operators: Mapped[list["Operator"]] = relationship(secondary=operator_input_queue_table, back_populates="inputs")
-    output_operators: Mapped[list["Operator"]] = relationship(secondary=operator_output_queue_table, back_populates="outputs")
 
 
 class Operator(Base):
@@ -63,8 +45,9 @@ class Operator(Base):
     name: Mapped[str] = mapped_column(CHAR(50), nullable=False, index=True)
 
     saga: Mapped[Saga] = relationship(back_populates="operators")
-    inputs: Mapped[list["Input"]] = relationship(secondary=operator_input_queue_table, back_populates="input_operators")
-    outputs: Mapped[list["Output"]] = relationship(secondary=operator_output_queue_table, back_populates="output_operators")
+    inputs: Mapped[list["Input"]] = relationship(back_populates="operator")
+    outputs: Mapped[list["Output"]] = relationship(back_populates="operator")
+    launches: Mapped[list["Launch"]] = relationship(back_populates="operator")
 
 
 class Input(Base):
@@ -119,7 +102,7 @@ class Stream(Base):
 
     job: Mapped["Job"] = relationship(back_populates="streams")
     queue: Mapped["Queue"] = relationship(back_populates="streams")
-    values: Mapped[list["Stream"]] = relationship(back_populates="stream")
+    values: Mapped[list["Value"]] = relationship(back_populates="stream")
 
 
 class Value(Base):
