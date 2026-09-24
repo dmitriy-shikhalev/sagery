@@ -23,20 +23,6 @@ class Saga(Base):
     jobs: Mapped[list["Job"]] = relationship(back_populates="saga")
 
 
-class Queue(Base):
-    __tablename__ = "queues"
-    __table_args__ = (UniqueConstraint("saga_id", "name", name="uq_queue"),)
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-    saga_id: Mapped[int] = mapped_column(ForeignKey("sagas.id"), nullable=False)
-    name: Mapped[str] = mapped_column(CHAR(50), nullable=False, index=True)
-
-    saga: Mapped["Saga"] = relationship(back_populates="queues")
-    streams: Mapped[list["Stream"]] = relationship(back_populates="queue")
-    inputs: Mapped[list["Input"]] = relationship(back_populates="inputs")
-    outputs: Mapped[list["Output"]] = relationship(back_populates="outputs")
-
-
 operator_input_queue_table = Table(
     "operator_input_queue",
     Base.metadata,
@@ -53,6 +39,22 @@ operator_output_queue_table = Table(
 )
 
 
+class Queue(Base):
+    __tablename__ = "queues"
+    __table_args__ = (UniqueConstraint("saga_id", "name", name="uq_queue"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    saga_id: Mapped[int] = mapped_column(ForeignKey("sagas.id"), nullable=False)
+    name: Mapped[str] = mapped_column(CHAR(50), nullable=False, index=True)
+
+    saga: Mapped["Saga"] = relationship(back_populates="queues")
+    streams: Mapped[list["Stream"]] = relationship(back_populates="queue")
+    inputs: Mapped[list["Input"]] = relationship(back_populates="queue")
+    outputs: Mapped[list["Output"]] = relationship(back_populates="queue")
+    input_operators: Mapped[list["Operator"]] = relationship(secondary=operator_input_queue_table, back_populates="inputs")
+    output_operators: Mapped[list["Operator"]] = relationship(secondary=operator_output_queue_table, back_populates="outputs")
+
+
 class Operator(Base):
     __tablename__ = "operators"
 
@@ -61,8 +63,8 @@ class Operator(Base):
     name: Mapped[str] = mapped_column(CHAR(50), nullable=False, index=True)
 
     saga: Mapped[Saga] = relationship(back_populates="operators")
-    inputs: Mapped[list[Queue]] = relationship(secondary=operator_input_queue_table, back_populates="operators")
-    outputs: Mapped[list[Queue]] = relationship(secondary=operator_output_queue_table, back_populates="operators")
+    inputs: Mapped[list["Input"]] = relationship(secondary=operator_input_queue_table, back_populates="input_operators")
+    outputs: Mapped[list["Output"]] = relationship(secondary=operator_output_queue_table, back_populates="output_operators")
 
 
 class Input(Base):
@@ -70,10 +72,11 @@ class Input(Base):
     __table_args__ = (UniqueConstraint("operator_id", "queue_id", name="uq_inputs"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    operator_id: Mapped[int] = mapped_column(ForeignKey("sagas.id"), nullable=False)
+    operator_id: Mapped[int] = mapped_column(ForeignKey("operators.id"), nullable=False)
     queue_id: Mapped[int] = mapped_column(ForeignKey("queues.id"), nullable=False)
 
-    operators: Mapped[list[Operator]] = relationship(secondary=operator_input_queue_table, back_populates="inputs")
+    queue: Mapped["Queue"] = relationship(back_populates="inputs")
+    operator: Mapped[Operator] = relationship(back_populates="inputs")
 
 
 class Output(Base):
@@ -81,10 +84,11 @@ class Output(Base):
     __table_args__ = (UniqueConstraint("operator_id", "queue_id", name="uq_outputs"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    operator_id: Mapped[int] = mapped_column(ForeignKey("sagas.id"), nullable=False)
+    operator_id: Mapped[int] = mapped_column(ForeignKey("operators.id"), nullable=False)
     queue_id: Mapped[int] = mapped_column(ForeignKey("queues.id"), nullable=False)
 
-    operators: Mapped[list[Operator]] = relationship(secondary=operator_output_queue_table, back_populates="outputs")
+    queue: Mapped["Queue"] = relationship(back_populates="outputs")
+    operator: Mapped[Operator] = relationship(back_populates="outputs")
 
 
 # Block jobs
