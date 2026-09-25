@@ -1,3 +1,4 @@
+from typing import Any
 from unittest.mock import Mock
 
 import pytest
@@ -8,18 +9,18 @@ from sagery.repositories import AbstractRepository, SagaRepository
 
 
 @pytest.mark.parametrize(
-    ["klass"],
+    ["klass", "dict_"],
     [
-        (SagaRepository,),
+        (SagaRepository, {"id": 10**5, "name": "abc"}),
     ],
 )
 class TestRepository:
-    def test_init(self, klass: Callable[[AsyncSession], AbstractRepository]) -> None:
+    def test_init(self, klass: Callable[[AsyncSession], AbstractRepository], dict_: dict[str, Any]) -> None:
         session = Mock()
         repository = klass(session)
         assert repository.session is session
 
-    async def test_create(self, klass: Callable[[AsyncSession], AbstractRepository]) -> None:
+    async def test_create(self, klass: Callable[[AsyncSession], AbstractRepository], dict_: dict[str, Any]) -> None:
         session = Mock()
         repository = klass(session)
-        await repository.create(id=10**5, name="abc")
+        await repository.create(**dict_)
