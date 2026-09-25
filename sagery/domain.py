@@ -3,25 +3,53 @@ from typing import Any
 
 from sagery.enums import Status
 
-# Block schema
+# Block types
 
 
+type IDType = int
+type IDTypeOrNone = IDType | None
 type QueueName = str
 type OperatorName = str
 
 
+# Block schema
+
+
+@dataclass(frozen=True)
+class Input:
+    id: IDTypeOrNone
+    operator_id: IDType
+    queue_id: IDType
+
+
+@dataclass(frozen=True)
+class Output:
+    id: IDTypeOrNone
+    operator_id: IDType
+    queue_id: IDType
+
+
+@dataclass(frozen=True)
+class Queue:
+    id: IDTypeOrNone
+    name: QueueName
+
+
 @dataclass
 class Operator:
+    id: IDTypeOrNone
     name: str
-    inputs: set[QueueName]
-    outputs: set[QueueName]
+    inputs: set[Input]
+    outputs: set[Output]
 
 
 @dataclass
 class Saga:
+    id: IDTypeOrNone
     name: str
+    comment: str | None
     operators: dict[OperatorName, Operator]
-    queues: set[QueueName]
+    queues: set[Queue]
 
 
 # Block jobs
@@ -29,19 +57,21 @@ class Saga:
 
 @dataclass
 class Launch:
-    id: int
+    id: IDTypeOrNone
     operator: OperatorName
     status: Status
 
 
 @dataclass
 class Value:
+    id: IDTypeOrNone
     data: Any
     done: bool
 
 
 @dataclass
 class Stream:
+    id: IDTypeOrNone
     name: QueueName
     values: list[Value]
     done: bool
@@ -49,7 +79,7 @@ class Stream:
 
 @dataclass
 class Job:
-    id: int
+    id: IDTypeOrNone
     saga_name: str
     streams: dict[QueueName, Stream]
     launches: dict[OperatorName, Launch]

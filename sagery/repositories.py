@@ -6,37 +6,35 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from sagery import domain
 from sagery.models import Input, Job, Launch, Operator, Output, Queue, Saga, Stream, Value
-
-ModelClass = Job | Input | Launch | Operator | Output | Queue | Saga | Stream | Value
-DomainModel = domain.Job | domain.Launch | domain.Operator | domain.Saga | domain.Stream
+from sagery.types import DBModel, DomainModel
 
 
-class AbstractRepository[Object: type[ModelClass], domain_model: type[DomainModel]](ABC):
+class AbstractRepository[db_model_type: type[DBModel], domain_model_type: type[DomainModel]](ABC):
     def __init__(self, session: AsyncSession):
         self.session = session
 
     @property
     @abstractmethod
-    def model(self) -> type[ModelClass]:
+    def model(self) -> db_model_type:
         raise NotImplementedError  # pragma: no cover
 
     @property
     @abstractmethod
-    def domain(self) -> type[DomainModel]:
+    def domain(self) -> domain_model_type:
         raise NotImplementedError  # pragma: no cover
 
-    async def create(self, **kwargs: Any) -> Object:
+    async def create(self, **kwargs: Any) -> domain_model_type:
         model = self.model(**kwargs)
         self.session.add(model)
         return model
 
-    async def get(self, id: int) -> Object:
+    async def get(self, id: int) -> domain_model_type:
         raise NotImplementedError
 
-    async def update(self, id: int, **kwargs: Mapping[Any, Any]) -> Object:
+    async def update(self, id: int, **kwargs: Mapping[Any, Any]) -> domain_model_type:
         raise NotImplementedError
 
-    async def delete(self, id: int) -> Object:
+    async def delete(self, id: int) -> domain_model_type:
         raise NotImplementedError
 
 
