@@ -15,21 +15,21 @@ type OperatorName = str
 # Block schema
 
 
-@dataclass(frozen=True)
+@dataclass
 class Input:
     id: IDTypeOrNone
     operator_id: IDType
     queue_id: IDType
 
 
-@dataclass(frozen=True)
+@dataclass
 class Output:
     id: IDTypeOrNone
     operator_id: IDType
     queue_id: IDType
 
 
-@dataclass(frozen=True)
+@dataclass
 class Queue:
     id: IDTypeOrNone
     name: QueueName
@@ -39,8 +39,8 @@ class Queue:
 class Operator:
     id: IDTypeOrNone
     name: str
-    inputs: set[Input]
-    outputs: set[Output]
+    inputs: list[Input]
+    outputs: list[Output]
 
 
 @dataclass
@@ -49,7 +49,7 @@ class Saga:
     name: str
     comment: str | None
     operators: dict[OperatorName, Operator]
-    queues: set[Queue]
+    queues: dict[QueueName, Queue]
 
 
 # Block jobs

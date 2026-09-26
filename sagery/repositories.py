@@ -33,12 +33,12 @@ class AbstractRepository[db_model_type: DBModel, domain_model_type: DomainModel,
     def converter(self) -> type[converter_class]:
         raise NotImplementedError  # pragma: no cover
 
-    async def create(self, domain_model: domain_model_type, update_id=False) -> domain_model_type:
+    async def create(self, domain_model: domain_model_type) -> domain_model_type:
         db_model = self.converter.from_domain_to_model(domain_model)
         self.session.add(db_model)
-        if update_id:
-            await self.session.flush()
-            domain_model.id = db_model.id
+
+        await self.session.flush()
+        domain_model.id = db_model.id
         return domain_model
 
     async def get(self, id: int) -> domain_model_type:
@@ -54,7 +54,7 @@ class AbstractRepository[db_model_type: DBModel, domain_model_type: DomainModel,
 # Schema block
 
 
-class SagaRepository(AbstractRepository):
+class SagaRepository(AbstractRepository[Saga, domain.Saga, SagaConverter]):
     model = Saga
     domain = domain.Saga
     converter = SagaConverter

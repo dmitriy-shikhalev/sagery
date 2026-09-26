@@ -23,7 +23,7 @@ class SagaConverter(AbstractConverter[models.Saga, domain.Saga]):
             id=db_model.id,
             name=db_model.name,
             comment=db_model.comment,
-            queues={QueueConverter.from_model_to_domain(queue) for queue in db_model.queues},
+            queues={queue.name: QueueConverter.from_model_to_domain(queue) for queue in db_model.queues},
             operators={
                 operator.name: OperatorConverter.from_model_to_domain(operator) for operator in db_model.operators
             },
@@ -59,8 +59,8 @@ class OperatorConverter(AbstractConverter[models.Operator, domain.Operator]):
         return domain.Operator(
             id=db_model.id,
             name=db_model.name,
-            inputs={InputConverter.from_model_to_domain(input_) for input_ in db_model.inputs},
-            outputs={OutputConverter.from_model_to_domain(output_) for output_ in db_model.outputs},
+            inputs=[InputConverter.from_model_to_domain(input_) for input_ in db_model.inputs],
+            outputs=[OutputConverter.from_model_to_domain(output_) for output_ in db_model.outputs],
         )
 
     @classmethod
