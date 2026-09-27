@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
 from collections.abc import Mapping
-from typing import Any
+from typing import Any, cast
 
-from sqlalchemy import select
+from sqlalchemy import delete, select, update
+from sqlalchemy.engine import CursorResult
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from sagery import domain
@@ -51,7 +52,7 @@ class AbstractRepository[db_model_type: DBModel, domain_model_type: DomainModel,
         return self.converter.from_model_to_domain(db_model_obj)  # type: ignore
 
     async def filter(
-        self, filter_: Mapping[str, Any], limit: int | None = None, offset: int | None = None
+        self, filter_: Mapping[str, Any], *, limit: int | None = None, offset: int | None = None
     ) -> list[domain_model_type]:
         stmt = select(self.model).filter_by(**filter_)
         if limit:
@@ -68,11 +69,17 @@ class AbstractRepository[db_model_type: DBModel, domain_model_type: DomainModel,
 
         return domain_object_list
 
-    async def update(self, filter_: Mapping[str, Any], update: Mapping[str, Any]) -> domain_model_type:
-        raise NotImplementedError
+    async def update(self, filter_: Mapping[str, Any], values: Mapping[str, Any]) -> int:
+        stmt = update(self.model).filter_by(**filter_).values(**values)
+        result = cast(CursorResult[Any], await self.session.execute(stmt))
+        return result.rowcount
 
-    async def delete(self, filter_: Mapping[str, Any]) -> domain_model_type:
-        raise NotImplementedError
+    async def delete(self, filter_: Mapping[str, Any]) -> int:
+        if not filter_:
+            raise ValueError("Don't use .delete({}). You try to remove all rows!")
+        stmt = delete(self.model).filter_by(**filter_)
+        result = cast(CursorResult[Any], await self.session.execute(stmt))
+        return result.rowcount
 
 
 # Schema block

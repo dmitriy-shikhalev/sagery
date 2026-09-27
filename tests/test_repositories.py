@@ -73,3 +73,68 @@ class TestRepository[db_model_type: DBModel, domain_model: DomainModel]:
             session.execute.return_value.first.assert_called_once_with()
 
             from_model_to_domain_mock.assert_called_once_with(db_model_obj)
+
+    @patch("sagery.repositories.select")
+    async def test_filter_with_limit_with_offset(
+        self, select_mock: Mock, klass: Callable[[AsyncSession], AbstractRepository], object_: domain_model
+    ) -> None:
+        db_model_obj = Mock()
+        session = Mock(execute=AsyncMock(return_value=Mock(all=Mock(return_value=[db_model_obj]))))
+        repository = klass(session)
+        with patch.object(repository.converter, "from_model_to_domain") as from_model_to_domain_mock:
+            result = await repository.filter({"a": "b", "c": "d"}, limit=10, offset=20)
+            assert result == [from_model_to_domain_mock.return_value]
+
+            select_mock.assert_called_once_with(repository.model)
+            select_mock.return_value.filter_by.assert_called_once_with(a="b", c="d")
+            select_mock.return_value.filter_by.return_value.limit.assert_called_once_with(10)
+            select_mock.return_value.filter_by.return_value.limit.return_value.offset.assert_called_once_with(20)
+
+            session.execute.assert_called_once_with(
+                select_mock.return_value.filter_by.return_value.limit.return_value.offset.return_value
+            )
+            session.execute.return_value.all.assert_called_once_with()
+
+            from_model_to_domain_mock.assert_called_once_with(db_model_obj)
+
+    @patch("sagery.repositories.update")
+    async def test_update(
+        self, update_mock: Mock, klass: Callable[[AsyncSession], AbstractRepository], object_: domain_model
+    ) -> None:
+        session = AsyncMock()
+        repository = klass(session)
+
+        result = await repository.update({"a": "b", "c": "d"}, {"e": "f"})
+
+        update_mock.assert_called_once_with(repository.model)
+        update_mock.return_value.filter_by.assert_called_once_with(a="b", c="d")
+        update_mock.return_value.filter_by.return_value.values.assert_called_once_with(e="f")
+        session.execute.assert_called_once_with(update_mock.return_value.filter_by.return_value.values.return_value)
+        assert result == session.execute.return_value.rowcount
+
+    @patch("sagery.repositories.delete")
+    async def test_delete(
+        self, delete_mock: Mock, klass: Callable[[AsyncSession], AbstractRepository], object_: domain_model
+    ) -> None:
+        session = AsyncMock()
+        repository = klass(session)
+
+        result = await repository.delete({"a": "b", "c": "d"})
+
+        delete_mock.assert_called_once_with(repository.model)
+        delete_mock.return_value.filter_by.assert_called_once_with(a="b", c="d")
+        session.execute.assert_called_once_with(delete_mock.return_value.filter_by.return_value)
+        assert result == session.execute.return_value.rowcount
+
+    @patch("sagery.repositories.delete")
+    async def test_delete_empty_filer(
+        self, delete_mock: Mock, klass: Callable[[AsyncSession], AbstractRepository], object_: domain_model
+    ) -> None:
+        session = AsyncMock()
+        repository = klass(session)
+
+        with pytest.raises(ValueError):
+            await repository.delete({})
+
+        delete_mock.assert_not_called()
+        session.execute.assert_not_called()
