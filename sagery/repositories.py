@@ -45,20 +45,33 @@ class AbstractRepository[db_model_type: DBModel, domain_model_type: DomainModel,
     async def get(self, id: int) -> domain_model_type | None:
         stmt = select(self.model).where(self.model.id == id).limit(1)
         result = await self.session.execute(stmt)
-        db_model = result.first()
-        if db_model is None:
+        db_model_obj = result.first()
+        if db_model_obj is None:
             return None
-        return self.converter.from_model_to_domain(db_model)  # type: ignore
+        return self.converter.from_model_to_domain(db_model_obj)  # type: ignore
 
     async def filter(
-        self, filter: Mapping[str, Any], limit: int | None = None, offset: int | None = None
+        self, filter_: Mapping[str, Any], limit: int | None = None, offset: int | None = None
     ) -> list[domain_model_type]:
+        stmt = select(self.model).filter_by(**filter_)
+        if limit:
+            stmt = stmt.limit(limit)
+        if offset:
+            stmt = stmt.offset(offset)
+        result = await self.session.execute(stmt)
+        db_model_list = result.all()
+
+        domain_object_list = []
+        for db_model_obj in db_model_list:
+            domain_object = self.converter.from_model_to_domain(db_model_obj)  # type: ignore
+            domain_object_list.append(domain_object)
+
+        return domain_object_list
+
+    async def update(self, filter_: Mapping[str, Any], update: Mapping[str, Any]) -> domain_model_type:
         raise NotImplementedError
 
-    async def update(self, id: int, **kwargs: Mapping[str, Any]) -> domain_model_type:
-        raise NotImplementedError
-
-    async def delete(self, id: int) -> domain_model_type:
+    async def delete(self, filter_: Mapping[str, Any]) -> domain_model_type:
         raise NotImplementedError
 
 
