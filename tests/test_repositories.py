@@ -4,8 +4,18 @@ from unittest.mock import AsyncMock, Mock, patch
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from sagery.models import Saga
-from sagery.repositories import AbstractRepository, SagaRepository
+from sagery.repositories import (
+    AbstractRepository,
+    InputRepository,
+    JobRepository,
+    LaunchRepository,
+    OperatorRepository,
+    OutputRepository,
+    QueueRepository,
+    SagaRepository,
+    StreamRepository,
+    ValueRepository,
+)
 from sagery.types import DBModel
 
 
@@ -13,6 +23,14 @@ from sagery.types import DBModel
     ["klass", "object_"],
     [
         (SagaRepository, {"id": 10**5, "name": "abc", "comment": "comment"}),
+        (QueueRepository, {"id": 10**5, "saga_id": 1, "name": "some-name"}),
+        (OperatorRepository, {"id": 10**5, "saga_id": 1, "name": "some-name"}),
+        (InputRepository, {"id": 10**5, "operator_id": 1, "queue_id": 1}),
+        (OutputRepository, {"id": 10**5, "operator_id": 1, "queue_id": 1}),
+        (JobRepository, {"id": 10**5, "saga_id": 1, "comment": "comment", "status": "done"}),
+        (StreamRepository, {"id": 10**5, "job_id": 1, "queue_id": 1, "done": False}),
+        (ValueRepository, {"id": 10**5, "stream_id": 1, "launch_id": 1, "data": {"a": "b"}, "done": True}),
+        (LaunchRepository, {"id": 10**5, "job_id": 1, "operator_id": 1, "status": "done"}),
     ],
 )
 class TestRepository[db_model_type: DBModel]:
@@ -27,14 +45,10 @@ class TestRepository[db_model_type: DBModel]:
 
         result = await repository.create(object_)
 
-        # from_domain_to_model_mock.assert_called_once_with(object_)
-        # session.add.assert_called_once_with(from_domain_to_model_mock.return_value)
         session.flush.assert_called_once_with()
-        # assert object_.id == from_domain_to_model_mock.return_value.id
-        assert isinstance(result, Saga)
-        assert result.id == 10**5
-        assert result.name == "abc"
-        assert result.comment == "comment"
+        assert isinstance(result, repository.model)
+        for k, v in object_.items():
+            assert getattr(result, k) == v
 
     @patch("sagery.repositories.select")
     async def test_get_none(
