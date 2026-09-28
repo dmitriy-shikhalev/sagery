@@ -6,17 +6,13 @@ from sqlalchemy import delete, select, update
 from sqlalchemy.engine import CursorResult
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from sagery import domain
-from sagery.converters import AbstractConverter, SagaConverter
 from sagery.models import Saga
 
 # from sagery.models import Input, Job, Launch, Operator, Output, Queue, Saga, Stream, Value
-from sagery.types import DBModel, DomainModel
+from sagery.types import DBModel
 
 
-class AbstractRepository[db_model_type: DBModel, domain_model_type: DomainModel, converter_class: AbstractConverter](
-    ABC
-):
+class AbstractRepository[db_model_type: DBModel](ABC):
     def __init__(self, session: AsyncSession):
         self.session = session
 
@@ -25,35 +21,24 @@ class AbstractRepository[db_model_type: DBModel, domain_model_type: DomainModel,
     def model(self) -> type[db_model_type]:
         raise NotImplementedError  # pragma: no cover
 
-    @property
-    @abstractmethod
-    def domain(self) -> type[domain_model_type]:
-        raise NotImplementedError  # pragma: no cover
-
-    @property
-    @abstractmethod
-    def converter(self) -> type[converter_class]:
-        raise NotImplementedError  # pragma: no cover
-
-    async def create(self, domain_model: domain_model_type) -> domain_model_type:
-        db_model = self.converter.from_domain_to_model(domain_model)
+    async def create(self, dict_: dict[str, Any]) -> db_model_type:
+        db_model = self.model(**dict_)
         self.session.add(db_model)
 
         await self.session.flush()
-        domain_model.id = db_model.id
-        return domain_model
+        return db_model
 
-    async def get(self, id: int) -> domain_model_type | None:
+    async def get(self, id: int) -> db_model_type | None:
         stmt = select(self.model).where(self.model.id == id).limit(1)
         result = await self.session.execute(stmt)
         db_model_obj = result.first()
         if db_model_obj is None:
             return None
-        return self.converter.from_model_to_domain(db_model_obj)  # type: ignore
+        return db_model_obj  # type: ignore
 
     async def filter(
         self, filter_: Mapping[str, Any], *, limit: int | None = None, offset: int | None = None
-    ) -> list[domain_model_type]:
+    ) -> list[db_model_type]:
         stmt = select(self.model).filter_by(**filter_)
         if limit:
             stmt = stmt.limit(limit)
@@ -62,12 +47,7 @@ class AbstractRepository[db_model_type: DBModel, domain_model_type: DomainModel,
         result = await self.session.execute(stmt)
         db_model_list = result.all()
 
-        domain_object_list = []
-        for db_model_obj in db_model_list:
-            domain_object = self.converter.from_model_to_domain(db_model_obj)  # type: ignore
-            domain_object_list.append(domain_object)
-
-        return domain_object_list
+        return db_model_list  # type: ignore
 
     async def update(self, filter_: Mapping[str, Any], values: Mapping[str, Any]) -> int:
         stmt = update(self.model).filter_by(**filter_).values(**values)
@@ -85,7 +65,5 @@ class AbstractRepository[db_model_type: DBModel, domain_model_type: DomainModel,
 # Schema block
 
 
-class SagaRepository(AbstractRepository[Saga, domain.Saga, SagaConverter]):
+class SagaRepository(AbstractRepository[Saga]):
     model = Saga
-    domain = domain.Saga
-    converter = SagaConverter
