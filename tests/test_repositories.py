@@ -40,7 +40,7 @@ class TestRepository[db_model_type: DBModel]:
         assert repository.session is session
 
     async def test_create(self, klass: Callable[[AsyncSession], AbstractRepository], object_: dict) -> None:
-        session = AsyncMock()
+        session = Mock(flush=AsyncMock())
         repository = klass(session)
 
         result = await repository.create(object_)
