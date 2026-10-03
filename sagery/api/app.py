@@ -9,8 +9,8 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # Здесь должен создаваться JobsStarter (или Runner) и OperatorStarter/Runner (?) и что еще?
     # Все это положить в app.state
     raise NotImplementedError
-    # Здесь должны гаситься все запущенные треды
     yield
+    # Здесь должны гаситься все запущенные треды
 
 
 app = FastAPI(title="sagery", lifespan=lifespan)
