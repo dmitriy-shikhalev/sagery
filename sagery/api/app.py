@@ -8,7 +8,8 @@ from fastapi import FastAPI
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # Здесь должен создаваться JobsStarter (или Runner) и OperatorStarter/Runner (?) и что еще?
     # Все это положить в app.state
-    raise NotImplementedError
+    app.state.job_starter = JobStarter()
+    app.state.job_starter.session_maker = get_session_maker()
     yield
     # Здесь должны гаситься все запущенные треды
 
