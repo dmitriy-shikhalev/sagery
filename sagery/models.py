@@ -124,6 +124,7 @@ class Launch(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id"), nullable=False)
     operator_id: Mapped[int] = mapped_column(ForeignKey("operators.id"), nullable=False)
+    state: Mapped[dict] = mapped_column(JSONB(), nullable=True)
     status: Mapped[Status] = mapped_column(String(10), nullable=False, default=Status.PREPARING, index=True)
 
     job: Mapped["Job"] = relationship(back_populates="launches")
