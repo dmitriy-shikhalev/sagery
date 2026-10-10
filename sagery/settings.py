@@ -11,6 +11,10 @@ class ApiSettings(BaseSettings):
     port: int
 
 
+class JobStarterSettings(BaseSettings):
+    max_count: int
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_nested_delimiter="__", env_file=".env", env_file_encoding="utf-8")
 
