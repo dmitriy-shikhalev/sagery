@@ -8,6 +8,8 @@ class JobStarter:
         self.engine = engine
         self.count = 0
         self.max_count = settings.max_count
+        self.sleep_time = settings.sleep_time
+        self.job_coroutines = []
 
     async def start(self):
         raise NotImplementedError

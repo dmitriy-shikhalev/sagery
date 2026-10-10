@@ -13,6 +13,7 @@ class ApiSettings(BaseSettings):
 
 class JobStarterSettings(BaseSettings):
     max_count: int
+    sleep_time: float
 
 
 class Settings(BaseSettings):
