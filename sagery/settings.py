@@ -21,3 +21,4 @@ class Settings(BaseSettings):
 
     api: ApiSettings
     postgres: PostgresSettings
+    job_starter: JobStarterSettings
