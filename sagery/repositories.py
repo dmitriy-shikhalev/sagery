@@ -6,7 +6,7 @@ from sqlalchemy import delete, select, update
 from sqlalchemy.engine import CursorResult
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from sagery.models import Input, Job, Launch, Operator, Output, Queue, Saga, Stream, Value
+from sagery.models import Job, Launch, Stream, Value
 from sagery.types import DBModel
 
 
@@ -58,29 +58,6 @@ class AbstractRepository[db_model_type: DBModel](ABC):
         stmt = delete(self.model).filter_by(**filter_)
         result = cast(CursorResult[Any], await self.session.execute(stmt))
         return result.rowcount
-
-
-# Schema block
-
-
-class SagaRepository(AbstractRepository[Saga]):
-    model = Saga
-
-
-class QueueRepository(AbstractRepository[Queue]):
-    model = Queue
-
-
-class OperatorRepository(AbstractRepository[Operator]):
-    model = Operator
-
-
-class InputRepository(AbstractRepository[Input]):
-    model = Input
-
-
-class OutputRepository(AbstractRepository[Output]):
-    model = Output
 
 
 class JobRepository(AbstractRepository[Job]):
