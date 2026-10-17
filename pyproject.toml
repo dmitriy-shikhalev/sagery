@@ -71,6 +71,10 @@ asyncio_mode = "auto"
 [tool.mypy]
 # Минимальная поддерживаемая версия Python
 python_version = "3.13"
+exclude = [
+    '^venv/',
+    'venv/',
+]
 
 # Запрещает вызов функций без аннотаций типов из функций с аннотациями
 disallow_untyped_calls = true
