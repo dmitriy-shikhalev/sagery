@@ -1,6 +1,14 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import Engine, create_engine
+from sqlalchemy.orm import Session, sessionmaker
 
-engine = create_engine("postgresql+psycopg2://scott:tiger@localhost/")
+from sagery.settings import PostgresSettings
 
-Session = sessionmaker(engine)
+
+def get_engine(settings: PostgresSettings) -> Engine:
+    engine = create_engine(f"{settings.url.unicode_string()}")
+    return engine
+
+
+def get_sessionmaker(engine: Engine) -> sessionmaker[Session]:
+    Session = sessionmaker(engine)
+    return Session
