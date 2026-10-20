@@ -65,7 +65,7 @@ ignore = []
 
 [tool.pytest.ini_options]
 # --ruff запускает линтер, --ruff-format проверяет форматирование
-addopts = "-vv --ruff --ruff-format --mypy --cov=sagery/ --cov-report=term-missing:skip-covered --cov-fail-under=80 --no-cov-on-fail -x --ff --ignore=migrations"
+addopts = "-vv --ruff --ruff-format --mypy --cov=sagery/ --cov-report=term-missing:skip-covered --cov-fail-under=100 --no-cov-on-fail -x --ff --ignore=migrations"
 asyncio_mode = "auto"
 
 [tool.mypy]
