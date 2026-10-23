@@ -7,3 +7,9 @@ class Status(StrEnum):
     DONE = "done"
     FAILED = "failed"
     ABORTED = "aborted"
+
+
+class StreamStatus(StrEnum):
+    NEW = "new"
+    CLOSED = "closed"
+    COMPLETED = "completed"

@@ -6,7 +6,7 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from sagery.db import Base
-from sagery.enums import Status
+from sagery.enums import Status, StreamStatus
 
 
 class Job(Base):
@@ -29,7 +29,7 @@ class Stream(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id"), nullable=False)
     queue_name: Mapped[str] = mapped_column(String(255), nullable=False)
-    done: Mapped[bool] = mapped_column(Boolean(), default=False, nullable=False, index=True)
+    status: Mapped[StreamStatus] = mapped_column(String(10), nullable=False, default=StreamStatus.NEW, index=True)
 
     job: Mapped["Job"] = relationship(back_populates="streams")
     values: Mapped[list["Value"]] = relationship(back_populates="stream")
