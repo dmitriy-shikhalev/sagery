@@ -1,8 +1,12 @@
+import logging
 from abc import ABC, abstractmethod
 
 from typing import Any
 
+from sagery.enums import Status
 from sagery.repositories import JobRepository, LaunchRepository, StreamRepository, ValueRepository
+
+logger = logging.getLogger(__name__)
 
 
 class AbstractService(ABC):
@@ -84,10 +88,40 @@ class LaunchService(AbstractService):
         value_repository: ValueRepository,
         launch_repository: LaunchRepository,
         job_id: int,
-        **kwargs: dict[str, Any]
+        **kwargs: Any,
     ):
         super().__init__(job_repository, stream_repository, value_repository, launch_repository, job_id, **kwargs)
-        self.operator_name = kwargs["operator_name"]
+        self.operator_name: str = kwargs["operator_name"]
+        self.function = kwargs["function"]
+        self.launch_id = kwargs["launch_id"]
 
     async def run(self):
-        raise NotImplementedError
+        generator = self.function()
+        anext(generator)
+
+        job = await self.job_repository.get(self.job_id)
+        streams = job.streams
+        launch = await self.launch_repository.get(self.launch_id)
+
+        for value in await self.value_repository.filter({"done": False}):
+            await self.value_repository.update({"id": value.id}, {"launch_id": launch.id, "done": True})
+
+            while True:
+                try:
+                    queue_name, data = await generator.asend((value.stream.queue_name, value.data))
+                except StopAsyncIteration:
+                    logger.info("Launch %s is over", launch.id)
+                    await self.launch_repository.update(
+                        {"id": launch.id, "status": Status.PROCESSING},
+                        {"status": Status.DONE},
+                    )
+                    break
+                except Exception as err:
+                    logger.error("Unexpected error in launch %s: %s", launch.id, err)
+                    await self.launch_repository.update(
+                        {"id": launch.id, "status": Status.PROCESSING},
+                        {"status": Status.FAILED},
+                    )
+                    break
+                else:
+
