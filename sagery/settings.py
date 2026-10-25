@@ -1,6 +1,8 @@
 from pydantic import BaseModel, PostgresDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from sagery.saga import Saga
+
 
 class PostgresSettings(BaseModel):
     url: PostgresDsn
@@ -14,18 +16,6 @@ class ApiSettings(BaseModel):
 class JobStarterSettings(BaseModel):
     max_count: int
     sleep_time: float
-
-
-class Operator(BaseModel):
-    name: str
-    inputs: list[str]
-    outputs: list[str]
-
-
-class Saga(BaseModel):
-    name: str
-    queues: list[str]
-    operators: list[Operator]
 
 
 class Settings(BaseSettings):
