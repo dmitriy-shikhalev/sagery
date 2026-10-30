@@ -47,9 +47,7 @@ class LaunchService(AbstractService):
         generator = self.function()
         anext(generator)
 
-        job = await self.job_repository.get(self.job_id)
-        streams = job.streams
-        launch = await self.launch_repository.get(self.launch_id)
+        launch = await self.launch_repository.get(id)
 
         for value in await self.value_repository.filter({"done": False}):
             await self.value_repository.update({"id": value.id}, {"launch_id": launch.id, "done": True})

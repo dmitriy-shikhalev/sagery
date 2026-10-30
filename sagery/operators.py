@@ -10,6 +10,9 @@ class AbstractOperator(ABC):
             yield  # Эта строка только для того, чтобы python понял, что .run - это асинхронный генератор
         raise NotImplementedError
 
+    async def start(self):
+        raise NotImplementedError
+
 
 class sum_2(AbstractOperator):
     async def run(self) -> AsyncGenerator[tuple[str, Any] | None, tuple[str, Any]]:
