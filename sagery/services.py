@@ -23,27 +23,27 @@ class AbstractService(ABC):
         self.launch_repository = launch_repository
 
     @abstractmethod
-    async def run(self, id: int):
+    async def run(self, id: int) -> None:
         raise NotImplementedError  # pragma: no cover
 
 
 class JobService(AbstractService):
-    async def run(self, id: int):
+    async def run(self, id: int) -> None:
         raise NotImplementedError
 
 
 class StreamService(AbstractService):
-    async def run(self, id: int):
+    async def run(self, id: int) -> None:
         raise NotImplementedError
 
 
 class ValueService(AbstractService):  # TODO: нужен ли этот сервис?
-    async def run(self):
+    async def run(self) -> None:
         raise NotImplementedError
 
 
 class LaunchService(AbstractService):
-    async def run(self, id: int):
+    async def run(self, id: int) -> None:
         generator = self.function()
         anext(generator)
 
@@ -70,4 +70,4 @@ class LaunchService(AbstractService):
                     )
                     break
                 else:
-
+                    raise NotImplementedError

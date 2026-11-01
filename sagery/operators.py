@@ -10,7 +10,7 @@ class AbstractOperator(ABC):
             yield  # Эта строка только для того, чтобы python понял, что .run - это асинхронный генератор
         raise NotImplementedError
 
-    async def start(self):
+    async def start(self) -> None:
         raise NotImplementedError
 
 

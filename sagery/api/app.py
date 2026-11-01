@@ -13,6 +13,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     app.state.settings = Settings()  # type: ignore
     engine = get_async_engine(app.state.settings.postgres)
     app.state.job_starter = JobStarter(engine, app.state.settings.job_starter)
+    app.state.jobs = {}
     await app.state.job_starter.start()
 
     yield
