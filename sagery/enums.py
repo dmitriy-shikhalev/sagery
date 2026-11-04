@@ -13,3 +13,11 @@ class StreamStatus(StrEnum):
     NEW = "new"
     CLOSED = "closed"
     COMPLETED = "completed"
+
+
+class OperatorStatus(StrEnum):
+    NOT_STARTED = "NOT_STARTED"
+    RUNNING = "RUNNING"
+    ERROR = "ERROR"
+    DONE = "DONE"
+    ABORTED = "ABORTED"

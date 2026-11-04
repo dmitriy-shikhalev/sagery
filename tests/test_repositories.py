@@ -18,7 +18,7 @@ from sagery.types import DBModel
     ["klass", "object_"],
     [
         (JobRepository, {"id": 10**5, "saga_name": "test", "comment": "comment", "status": "done"}),
-        (StreamRepository, {"id": 10**5, "job_id": 1, "queue_name": "test", "done": False}),
+        (StreamRepository, {"id": 10**5, "job_id": 1, "queue_name": "test", "status": "completed"}),
         (ValueRepository, {"id": 10**5, "stream_id": 1, "launch_id": 1, "data": {"a": "b"}, "done": True}),
         (LaunchRepository, {"id": 10**5, "job_id": 1, "operator_name": "test", "status": "done"}),
     ],

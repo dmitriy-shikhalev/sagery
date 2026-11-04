@@ -1,6 +1,6 @@
 import uvicorn
 
-from sagery.api.app import app
+from sagery.app import app
 from sagery.settings import Settings
 
 

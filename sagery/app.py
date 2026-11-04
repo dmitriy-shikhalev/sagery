@@ -11,7 +11,7 @@ from sagery.settings import Settings
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     app.state.settings = Settings()  # type: ignore
     engine = get_async_engine(app.state.settings.postgres)
-    # todo: init launch manager
+    # todo: init manager
 
     yield
 
