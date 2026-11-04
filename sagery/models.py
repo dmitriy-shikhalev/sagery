@@ -6,7 +6,7 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from sagery.db import Base
-from sagery.enums import Status
+from sagery.enums import JobStatus, OperatorStatus
 
 
 class Job(Base):
@@ -17,7 +17,7 @@ class Job(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime(), server_default=func.now(), onupdate=func.now())
     comment: Mapped[str] = mapped_column(TEXT(), nullable=True)
-    status: Mapped[Status] = mapped_column(String(10), nullable=False, default=Status.PREPARING, index=True)
+    status: Mapped[JobStatus] = mapped_column(String(10), nullable=False, default=JobStatus.PREPARING, index=True)
 
     streams: Mapped[list["Stream"]] = relationship(back_populates="job")
     launches: Mapped[list["Launch"]] = relationship(back_populates="job")
@@ -53,7 +53,9 @@ class Launch(Base):
     job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id"), nullable=False)
     operator_name: Mapped[str] = mapped_column(String(255), nullable=False)
     state: Mapped[dict] = mapped_column(JSONB(), nullable=True)
-    status: Mapped[Status] = mapped_column(String(10), nullable=False, default=Status.PREPARING, index=True)
+    status: Mapped[OperatorStatus] = mapped_column(
+        String(10), nullable=False, default=OperatorStatus.NOT_STARTED, index=True
+    )
 
     job: Mapped["Job"] = relationship(back_populates="launches")
     values: Mapped[list["Value"]] = relationship(back_populates="launch")

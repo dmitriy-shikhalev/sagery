@@ -1,7 +1,7 @@
 from enum import StrEnum
 
 
-class Status(StrEnum):
+class JobStatus(StrEnum):
     PREPARING = "preparing"
     PROCESSING = "processing"
     DONE = "done"
@@ -10,8 +10,8 @@ class Status(StrEnum):
 
 
 class OperatorStatus(StrEnum):
-    NOT_STARTED = "NOT_STARTED"
-    RUNNING = "RUNNING"
-    ERROR = "ERROR"
-    DONE = "DONE"
-    ABORTED = "ABORTED"
+    NOT_STARTED = "not_started"
+    RUNNING = "running"
+    ERROR = "error"
+    DONE = "done"
+    ABORTED = "aborted"
