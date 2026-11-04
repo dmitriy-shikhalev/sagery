@@ -1,0 +1,21 @@
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI
+
+from sagery.engine import get_async_engine
+from sagery.settings import Settings
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    app.state.settings = Settings()  # type: ignore
+    engine = get_async_engine(app.state.settings.postgres)
+    # todo: init manager
+
+    yield
+
+    await engine.dispose()
+
+
+app = FastAPI(title="sagery", lifespan=lifespan)
