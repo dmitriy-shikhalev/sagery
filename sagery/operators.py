@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 class AbstractOperator(ABC):
     task: asyncio.Task | None = None
 
-    def __init__(self, **kwargs: Any):
+    def __init__(self, /, **kwargs: Any):
         self.kwargs = kwargs
         self.inputs: asyncio.Queue[tuple[str, Any]] = asyncio.Queue()
         self.outputs: asyncio.Queue[tuple[str, Any]] = asyncio.Queue()
@@ -31,6 +31,8 @@ class AbstractOperator(ABC):
             return OperatorStatus.RUNNING
 
     def start(self) -> None:
+        if self.task is not None:
+            raise ValueError(f"Try to start operator {self}, that has already started!")
         self.task = asyncio.create_task(self._run_handler())
 
     async def _run_handler(self) -> None:
@@ -47,7 +49,7 @@ class AbstractOperator(ABC):
 
 class sum_2(AbstractOperator):
     async def run(self) -> None:
-        print("start")
+        logger.info("Start sum_2 operator")
         var_name1, value1 = await self.inputs.get()
         if var_name1 != "a":
             raise NameError(f"Unknown variable {var_name1}")
@@ -55,4 +57,4 @@ class sum_2(AbstractOperator):
         if var_name2 != "b":
             raise NameError(f"Unknown variable {var_name1}")
 
-        await self.inputs.put(("c", value1 + value2))
+        await self.outputs.put(("c", value1 + value2))

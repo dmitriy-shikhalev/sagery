@@ -9,12 +9,6 @@ class Status(StrEnum):
     ABORTED = "aborted"
 
 
-class StreamStatus(StrEnum):
-    NEW = "new"
-    CLOSED = "closed"
-    COMPLETED = "completed"
-
-
 class OperatorStatus(StrEnum):
     NOT_STARTED = "NOT_STARTED"
     RUNNING = "RUNNING"
