@@ -68,7 +68,9 @@ class TestRepository[db_model_type: DBModel]:
         repository = klass(session)
 
         result = await repository.get(id_)
-        assert result == db_model_obj
+        assert result == db_model_obj.as_dict.return_value
+
+        db_model_obj.as_dict.assert_called_once_with()
 
         select_mock.assert_called_once_with(repository.model)
         select_mock.return_value.where.assert_called_once()
@@ -86,7 +88,9 @@ class TestRepository[db_model_type: DBModel]:
         repository = klass(session)
 
         result = await repository.filter({"a": "b", "c": "d"}, limit=10, offset=20)
-        assert result == [db_model_obj]
+        assert result == [db_model_obj.as_dict.return_value]
+
+        db_model_obj.as_dict.assert_called_once_with()
 
         select_mock.assert_called_once_with(repository.model)
         select_mock.return_value.filter_by.assert_called_once_with(a="b", c="d")
