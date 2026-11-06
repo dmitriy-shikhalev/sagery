@@ -36,9 +36,9 @@ class TestRepository[db_model_type: DBModel]:
         result = await repository.create(object_)
 
         session.flush.assert_called_once_with()
-        assert isinstance(result, repository.model)
+        assert isinstance(result, dict)
         for k, v in object_.items():
-            assert getattr(result, k) == v
+            assert result[k] == v
 
     @patch("sagery.repositories.select")
     async def test_get_none(

@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Mapping
 from typing import Any, cast
 
-from sqlalchemy import delete, select, update
+from sqlalchemy import delete, inspect, select, update
 from sqlalchemy.engine import CursorResult
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -19,12 +19,12 @@ class AbstractRepository[db_model_type: DBModel](ABC):
     def model(self) -> type[db_model_type]:
         raise NotImplementedError  # pragma: no cover
 
-    async def create(self, dict_: dict[str, Any]) -> db_model_type:
+    async def create(self, dict_: dict[str, Any]) -> dict[str, Any]:
         db_model = self.model(**dict_)
         self.session.add(db_model)
 
         await self.session.flush()
-        return db_model
+        return {k: getattr(db_model, k) for k in inspect(db_model).mapper.column_attrs.keys()}  # type: ignore[attr-defined]
 
     async def get(self, id: int) -> db_model_type | None:
         stmt = select(self.model).where(self.model.id == id).limit(1)
