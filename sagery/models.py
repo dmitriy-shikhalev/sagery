@@ -3,13 +3,19 @@ from typing import Any
 
 from sqlalchemy import TEXT, DateTime, ForeignKey, String, func
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, class_mapper, mapped_column, relationship
 
 from sagery.db import Base
 from sagery.enums import JobStatus, OperatorStatus
 
 
-class Job(Base):
+class DbModelAsDictMixin:
+    def as_dict(self) -> dict[str, Any]:
+        mapper = class_mapper(type(self))
+        return {attr.key: getattr(self, attr.key) for attr in mapper.column_attrs}
+
+
+class Job(DbModelAsDictMixin, Base):
     __tablename__ = "jobs"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -23,7 +29,7 @@ class Job(Base):
     launches: Mapped[list["Launch"]] = relationship(back_populates="job")
 
 
-class Stream(Base):
+class Stream(DbModelAsDictMixin, Base):
     __tablename__ = "streams"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -34,7 +40,7 @@ class Stream(Base):
     values: Mapped[list["Value"]] = relationship(back_populates="stream")
 
 
-class Value(Base):
+class Value(DbModelAsDictMixin, Base):
     __tablename__ = "values"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -46,7 +52,7 @@ class Value(Base):
     launch: Mapped["Launch"] = relationship(back_populates="values")
 
 
-class Launch(Base):
+class Launch(DbModelAsDictMixin, Base):
     __tablename__ = "launches"
 
     id: Mapped[int] = mapped_column(primary_key=True)
