@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  rabbitmq:
+    image: rabbitmq:4-management-alpine
+    container_name: rabbitmq
+    hostname: rabbitmq-node
+    restart: unless-stopped
+    ports:
+      # Главный порт для подключения приложений (AMQP протокол)
+      - "5672:5672"
+      # Порт веб-интерфейса управления (Management UI)
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=secret123
+    volumes:
+      # Постоянное хранилище для данных RabbitMQ
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "-q", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+
+volumes:
+  rabbitmq_data:
