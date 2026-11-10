@@ -1,7 +1,7 @@
-from pydantic import BaseModel, PostgresDsn
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from typing import Any
 
-from sagery.saga import Saga
+from pydantic import BaseModel, Field, PostgresDsn
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class PostgresSettings(BaseModel):
@@ -18,10 +18,23 @@ class JobStarterSettings(BaseModel):
     sleep_time: float
 
 
+class Operator(BaseSettings):
+    name: str
+    inputs: list[str]
+    outputs: list[str]
+    params: dict[str, Any] = Field(default_factory=dict)
+
+
+class Saga(BaseSettings):
+    name: str
+    queues: list[str]
+    operators: dict[str, Operator]
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_nested_delimiter="__", env_file=".env", env_file_encoding="utf-8")
 
-    sagas: list[Saga]
+    sagas: dict[str, Saga]
     api: ApiSettings
     postgres: PostgresSettings
     job_starter: JobStarterSettings
