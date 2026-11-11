@@ -18,31 +18,28 @@ class ApiSettings(BaseModel):
     port: int
 
 
-class JobStarterSettings(BaseModel):
-    max_count: int
-    sleep_time: float
-
-
 class Operator(BaseSettings):
+    package: str
+    module: str
+    klass: str
     name: str
     inputs: list[str]
     outputs: list[str]
-    params: dict[str, Any] = Field(default_factory=dict)
+    params: dict[str, Any]
 
 
 class Saga(BaseSettings):
     name: str
     queues: list[str]
-    operators: dict[str, Operator]
+    operators: list[Operator]
 
 
 class Settings(BaseSettings):
     config_file: ClassVar[Path] = Path("config.yaml")
 
-    sagas: dict[str, Saga]
+    sagas: list[Saga]
     api: ApiSettings
     postgres: PostgresSettings
-    job_starter: JobStarterSettings
 
     @classmethod
     def settings_customise_sources(
