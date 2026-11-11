@@ -8,8 +8,14 @@ from pydantic_settings import (
     YamlConfigSettingsSource,
 )
 
+from sagery.enums import QueueEngine
 
-class RabbitMQSettings:
+
+class LocalQueueSettings(BaseSettings):
+    pass
+
+
+class RabbitMQSettings(BaseSettings):
     host: str
     port: str
     login: str
@@ -17,7 +23,9 @@ class RabbitMQSettings:
 
 
 class QueueSettings(BaseModel):
-    rabbitmq: RabbitMQSettings
+    engine: QueueEngine
+    local_queue: LocalQueueSettings | None = None
+    rabbitmq: RabbitMQSettings | None = None
 
 
 class ApiSettings(BaseModel):
@@ -46,7 +54,7 @@ class Settings(BaseSettings):
 
     sagas: list[Saga]
     api: ApiSettings
-    postgres: PostgresSettings
+    queue: QueueSettings
 
     @classmethod
     def settings_customise_sources(

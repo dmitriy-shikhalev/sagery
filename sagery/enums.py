@@ -1,6 +1,11 @@
 from enum import StrEnum
 
 
+class QueueEngine(StrEnum):
+    LOCAL = "local"
+    RABBITMQ = "rabbitmq"
+
+
 class JobStatus(StrEnum):
     PREPARING = "preparing"
     PROCESSING = "processing"

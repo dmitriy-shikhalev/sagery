@@ -9,7 +9,7 @@ from sagery.settings import Settings
 
 def get_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
-    parser.add_argument("-c", "--config", type=Path, required=True)
+    parser.add_argument("-c", "--config", type=Path, required=False, default="config.yaml")
     args = parser.parse_args()
 
     if not args.config.is_file():
