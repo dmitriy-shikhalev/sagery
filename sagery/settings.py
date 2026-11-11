@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Any, ClassVar
 
-from pydantic import BaseModel, Field, PostgresDsn
+from pydantic import BaseModel
 from pydantic_settings import (
     BaseSettings,
     PydanticBaseSettingsSource,
@@ -9,8 +9,15 @@ from pydantic_settings import (
 )
 
 
-class PostgresSettings(BaseModel):
-    url: PostgresDsn
+class RabbitMQSettings:
+    host: str
+    port: str
+    login: str
+    password: str
+
+
+class QueueSettings(BaseModel):
+    rabbitmq: RabbitMQSettings
 
 
 class ApiSettings(BaseModel):
