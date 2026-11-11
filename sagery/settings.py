@@ -1,7 +1,12 @@
-from typing import Any
+from pathlib import Path
+from typing import Any, ClassVar
 
 from pydantic import BaseModel, Field, PostgresDsn
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import (
+    BaseSettings,
+    PydanticBaseSettingsSource,
+    YamlConfigSettingsSource,
+)
 
 
 class PostgresSettings(BaseModel):
@@ -32,9 +37,23 @@ class Saga(BaseSettings):
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_nested_delimiter="__", env_file=".env", env_file_encoding="utf-8")
+    config_file: ClassVar[Path] = Path("config.yaml")
 
     sagas: dict[str, Saga]
     api: ApiSettings
     postgres: PostgresSettings
     job_starter: JobStarterSettings
+
+    @classmethod
+    def settings_customise_sources(
+        cls,
+        settings_cls: type[BaseSettings],
+        init_settings: PydanticBaseSettingsSource,
+        env_settings: PydanticBaseSettingsSource,  # намеренно не используется
+        dotenv_settings: PydanticBaseSettingsSource,  # намеренно не используется
+        file_secret_settings: PydanticBaseSettingsSource,
+    ) -> tuple[PydanticBaseSettingsSource, ...]:
+        return (
+            init_settings,
+            YamlConfigSettingsSource(settings_cls, yaml_file=cls.config_file),
+        )
