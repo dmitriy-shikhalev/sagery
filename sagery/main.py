@@ -8,7 +8,7 @@ from sagery.settings import Settings
 
 
 def get_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description="sagery")
     parser.add_argument("-c", "--config", type=Path, required=False, default="config.yaml")
     args = parser.parse_args()
 

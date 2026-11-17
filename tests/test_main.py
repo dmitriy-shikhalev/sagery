@@ -10,7 +10,7 @@ from sagery.main import get_args, main
 def test_get_args_ok(argument_parser_mock: Mock) -> None:
     result = get_args()
 
-    argument_parser_mock.assert_called_once_with()
+    argument_parser_mock.assert_called_once_with(description="sagery")
     argument_parser_mock.return_value.add_argument.assert_called_once_with(
         "-c", "--config", type=Path, required=False, default="config.yaml"
     )

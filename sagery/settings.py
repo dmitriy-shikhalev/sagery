@@ -1,5 +1,6 @@
+from importlib import import_module
 from pathlib import Path
-from typing import Any, ClassVar
+from typing import Any, ClassVar, cast
 
 from pydantic import BaseModel
 from pydantic_settings import (
@@ -9,6 +10,9 @@ from pydantic_settings import (
 )
 
 from sagery.enums import QueueEngine
+from sagery.models import Operator as ModelOperator
+from sagery.models import Saga as ModelSaga
+from sagery.operators import AbstractOperator
 
 
 class LocalQueueSettings(BaseSettings):
@@ -42,11 +46,33 @@ class Operator(BaseSettings):
     outputs: list[str]
     params: dict[str, Any]
 
+    def get_operator(self) -> AbstractOperator:
+        mod = import_module(self.package, self.module)
+        klass = cast(type[AbstractOperator], getattr(mod, self.klass))
+        if not issubclass(klass, AbstractOperator):
+            raise ValueError(f"Object {self.package}.{self.module}.{self.klass} is not Operator")
+        return klass(**self.params)
+
+    def to_model(self) -> ModelOperator:
+        return ModelOperator(
+            name="abc",
+            object=self.get_operator(),
+            inputs=set(self.inputs),
+            outputs=set(self.outputs),
+        )
+
 
 class Saga(BaseSettings):
     name: str
     queues: list[str]
     operators: list[Operator]
+
+    def to_model(self) -> ModelSaga:
+        return ModelSaga(
+            name=self.name,
+            queues=set(self.queues),
+            operators={operator.name: operator.to_model() for operator in self.operators},
+        )
 
 
 class Settings(BaseSettings):

@@ -1,67 +1,53 @@
+from __future__ import annotations
+
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import TEXT, DateTime, ForeignKey, String, func
-from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import Mapped, class_mapper, mapped_column, relationship
+from pydantic import BaseModel, ConfigDict, Field
 
-from sagery.db import Base
 from sagery.enums import JobStatus, OperatorStatus
+from sagery.operators import AbstractOperator
+
+# Schema
 
 
-class DbModelAsDictMixin:
-    def as_dict(self) -> dict[str, Any]:
-        mapper = class_mapper(type(self))
-        return {attr.key: getattr(self, attr.key) for attr in mapper.column_attrs}
+class Saga(BaseModel):
+    name: str
+    queues: set[str]
+    operators: dict[str, Operator]
 
 
-class Job(DbModelAsDictMixin, Base):
-    __tablename__ = "jobs"
+class Operator(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-    saga_name: Mapped[str] = mapped_column(String(255), nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime(), server_default=func.now())
-    updated_at: Mapped[datetime] = mapped_column(DateTime(), server_default=func.now(), onupdate=func.now())
-    comment: Mapped[str] = mapped_column(TEXT(), nullable=True)
-    status: Mapped[JobStatus] = mapped_column(String(10), nullable=False, default=JobStatus.PREPARING, index=True)
-
-    streams: Mapped[list["Stream"]] = relationship(back_populates="job")
-    launches: Mapped[list["Launch"]] = relationship(back_populates="job")
+    name: str
+    object: AbstractOperator = Field(exclude=True)
+    inputs: set[str]
+    outputs: set[str]
 
 
-class Stream(DbModelAsDictMixin, Base):
-    __tablename__ = "streams"
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-    job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id"), nullable=False)
-    queue_name: Mapped[str] = mapped_column(String(255), nullable=False)
-
-    job: Mapped["Job"] = relationship(back_populates="streams")
-    values: Mapped[list["Value"]] = relationship(back_populates="stream")
+# Jobs
 
 
-class Value(DbModelAsDictMixin, Base):
-    __tablename__ = "values"
+class Job(BaseModel):
+    id: str
+    saga_name: str
+    status: JobStatus
+    created_at: datetime = Field(default_factory=datetime.now)
+    updated_at: datetime = Field(default_factory=datetime.now)
+    comment: str = ""
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-    stream_id: Mapped[int] = mapped_column(ForeignKey("streams.id"), nullable=False)
-    launch_id: Mapped[int] = mapped_column(ForeignKey("launches.id"), nullable=False)
-    data: Mapped[Any] = mapped_column(JSONB(), nullable=False)
-
-    stream: Mapped["Stream"] = relationship(back_populates="values")
-    launch: Mapped["Launch"] = relationship(back_populates="values")
+    streams: dict[str, Stream] = Field(default_factory=dict)
 
 
-class Launch(DbModelAsDictMixin, Base):
-    __tablename__ = "launches"
+class Stream(BaseModel):
+    queue_name: str
+    values: list[Any]
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-    job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id"), nullable=False)
-    operator_name: Mapped[str] = mapped_column(String(255), nullable=False)
-    state: Mapped[dict] = mapped_column(JSONB(), nullable=True)
-    status: Mapped[OperatorStatus] = mapped_column(
-        String(10), nullable=False, default=OperatorStatus.NOT_STARTED, index=True
-    )
 
-    job: Mapped["Job"] = relationship(back_populates="launches")
-    values: Mapped[list["Value"]] = relationship(back_populates="launch")
+class Launch(BaseModel):
+    id: str
+    job_id: str
+    operator_name: str
+    # state: dict ???
+    status: OperatorStatus
