@@ -55,7 +55,7 @@ class Operator(BaseSettings):
 
     def to_model(self) -> ModelOperator:
         return ModelOperator(
-            name="abc",
+            name=self.name,
             object=self.get_operator(),
             inputs=set(self.inputs),
             outputs=set(self.outputs),
