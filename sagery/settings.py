@@ -47,7 +47,7 @@ class Operator(BaseSettings):
     params: dict[str, Any]
 
     def get_operator(self) -> AbstractOperator:
-        mod = import_module(self.package, self.module)
+        mod = import_module(f"{self.package}.{self.module}")
         klass = cast(type[AbstractOperator], getattr(mod, self.klass))
         if not issubclass(klass, AbstractOperator):
             raise ValueError(f"Object {self.package}.{self.module}.{self.klass} is not Operator")

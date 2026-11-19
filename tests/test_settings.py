@@ -1,6 +1,10 @@
 from unittest.mock import Mock, patch
 
-from sagery import operators, settings
+import pytest
+
+from sagery import models, operators, settings
+
+fake = operators.sum_2()
 
 
 @patch("sagery.settings.YamlConfigSettingsSource")
@@ -20,17 +24,53 @@ def test_settings_customise_sources(source_mock: Mock) -> None:
         assert s == (init_settings, source_mock.return_value)
 
 
-class TestOperator:
-    def test_get_operator(self) -> None:
-        operator_settings = settings.Operator(
-            package="sagery",
-            module="operators",
-            klass="sum_2",
-            name="sum2",
-            inputs=["a", "b"],
-            outputs=["c"],
-            params={},
-        )
+@pytest.fixture()
+def operator_settings() -> settings.Operator:
+    return settings.Operator(
+        package="sagery",
+        module="operators",
+        klass="sum_2",
+        name="sum2",
+        inputs=["a", "b"],
+        outputs=["c"],
+        params={},
+    )
 
+
+@pytest.fixture()
+def saga_settings(operator_settings: settings.Operator) -> settings.Saga:
+    return settings.Saga(
+        name="test saga",
+        queues=["a", "b", "c"],
+        operators=[operator_settings],
+    )
+
+
+class TestOperator:
+    def test_get_operator_ok(self, operator_settings: settings.Operator) -> None:
         operator = operator_settings.get_operator()
-        assert operator is operators.sum_2
+        assert isinstance(operator, operators.sum_2)
+
+    def test_get_operator_value_error(self, operator_settings: settings.Operator) -> None:
+        with (
+            pytest.raises(ValueError),
+            patch.object(operator_settings, "module", "settings"),
+            patch.object(operator_settings, "klass", "Operator"),
+        ):
+            operator_settings.get_operator()
+
+    def test_to_model(self, operator_settings: settings.Operator) -> None:
+        with patch.object(settings.Operator, "get_operator", return_value=fake) as get_operator_mock:
+            model = operator_settings.to_model()
+            assert isinstance(model, models.Operator)
+            assert model.name == "sum2"
+            assert model.inputs == {"a", "b"}
+            assert model.outputs == {"c"}
+            get_operator_mock.assert_called_once_with()
+            assert model.object == get_operator_mock.return_value
+
+
+class TestSaga:
+    def test_to_model(self, saga_settings: settings.Saga) -> None:
+        saga = saga_settings.to_model()
+        assert isinstance(saga, models.Saga)
