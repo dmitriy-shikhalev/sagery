@@ -82,6 +82,9 @@ class Settings(BaseSettings):
     api: ApiSettings
     queue: QueueSettings
 
+    def get_sagas_dict(self) -> dict[str, ModelSaga]:
+        return {s.name: s.to_model() for s in self.sagas}
+
     @classmethod
     def settings_customise_sources(
         cls,

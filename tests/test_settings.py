@@ -2,26 +2,37 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from sagery import models, operators, settings
+from sagery import enums, models, operators, settings
 
 fake = operators.sum_2()
 
 
-@patch("sagery.settings.YamlConfigSettingsSource")
-def test_settings_customise_sources(source_mock: Mock) -> None:
-    settings_cls = Mock()
-    init_settings = Mock()
-    env_settings = Mock()
-    dotenv_settings = Mock()
-    file_secret_settings = Mock()
-
-    with patch.object(settings.Settings, "config_file") as config_file:
-        s = settings.Settings.settings_customise_sources(
-            settings_cls, init_settings, env_settings, dotenv_settings, file_secret_settings
+class TestSettings:
+    def test_get_sagas_dict(self) -> None:
+        settings_obj = settings.Settings(
+            sagas=[settings.Saga(name="test", queues=[], operators=[])],
+            api=settings.ApiSettings(host="test", port=123),
+            queue=settings.QueueSettings(engine=enums.QueueEngine.LOCAL),
         )
+        assert settings_obj.get_sagas_dict() == {
+            "test": models.Saga(name="test", queues=set(), operators={}),
+        }
 
-        source_mock.assert_called_once_with(settings_cls, yaml_file=config_file)
-        assert s == (init_settings, source_mock.return_value)
+    @patch("sagery.settings.YamlConfigSettingsSource")
+    def test_settings_customise_sources(self, source_mock: Mock) -> None:
+        settings_cls = Mock()
+        init_settings = Mock()
+        env_settings = Mock()
+        dotenv_settings = Mock()
+        file_secret_settings = Mock()
+
+        with patch.object(settings.Settings, "config_file") as config_file:
+            s = settings.Settings.settings_customise_sources(
+                settings_cls, init_settings, env_settings, dotenv_settings, file_secret_settings
+            )
+
+            source_mock.assert_called_once_with(settings_cls, yaml_file=config_file)
+            assert s == (init_settings, source_mock.return_value)
 
 
 @pytest.fixture()

@@ -9,7 +9,7 @@ from sagery.settings import Settings
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     app.state.settings = Settings()  # type: ignore
-    # todo: init manager
+    app.state.sagas = app.state.settings.get_sagas_dict()
 
     yield
 

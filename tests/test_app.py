@@ -12,3 +12,5 @@ async def test_lifespan(settings_mock: Mock) -> None:
 
     settings_mock.assert_called_once_with()
     assert app_mock.state.settings == settings_mock.return_value
+    settings_mock.return_value.get_sagas_dict.assert_called_once_with()
+    assert app_mock.state.sagas == settings_mock.return_value.get_sagas_dict.return_value
