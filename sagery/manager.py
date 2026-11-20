@@ -1,2 +1,7 @@
+from sagery.models import Saga, Stream
+
+
 class Manager:
-    pass
+    def __init__(self, saga: Saga, streams: dict[str, Stream]):
+        self.saga = saga
+        self.streams = streams

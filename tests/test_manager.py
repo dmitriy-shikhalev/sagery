@@ -1,5 +1,13 @@
+from unittest.mock import Mock
+
 from sagery.manager import Manager
 
 
-def test_empty() -> None:  # todo: remove this empty test or enhance the functionality of the test
-    _ = Manager()
+class TestManager:
+    def test_init(self) -> None:
+        saga = Mock()
+        streams = Mock()
+
+        manager = Manager(saga, streams)
+        assert manager.saga == saga
+        assert manager.streams == streams

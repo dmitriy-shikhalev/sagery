@@ -38,6 +38,7 @@ class Job(BaseModel):
     comment: str = ""
 
     streams: dict[str, Stream] = Field(default_factory=dict)
+    manager: 'Manager' = Field(exclude=True, default=None)
 
 
 class Stream(BaseModel):
