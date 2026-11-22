@@ -8,8 +8,6 @@ from pydantic import BaseModel, ConfigDict, Field
 from sagery.enums import JobStatus, OperatorStatus
 from sagery.operators import AbstractOperator
 
-# Schema
-
 
 class Saga(BaseModel):
     name: str

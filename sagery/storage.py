@@ -13,6 +13,9 @@ class Launch:
         self.outputs = outputs
         self.object = object
 
+    async def start(self) -> None:
+        await self.object.start()
+
 
 class Job:
     task: asyncio.Task | None = None
