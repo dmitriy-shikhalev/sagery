@@ -3,7 +3,7 @@ import uuid
 
 from sagery.enums import JobStatus
 from sagery.manager import Manager
-from sagery.models import Job, Saga, Stream, Operator
+from sagery.schema import Job, Saga, Stream, Operator
 from sagery.operators import AbstractOperator
 
 

@@ -1,4 +1,4 @@
-from sagery.models import Saga, Stream
+from sagery.schema import Saga, Stream
 
 
 class Manager:

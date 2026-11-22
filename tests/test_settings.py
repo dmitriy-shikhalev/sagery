@@ -2,7 +2,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from sagery import enums, models, operators, settings
+from sagery import enums, schema, operators, settings
 
 fake = operators.sum_2()
 
@@ -15,7 +15,7 @@ class TestSettings:
             queue=settings.QueueSettings(engine=enums.QueueEngine.LOCAL),
         )
         assert settings_obj.get_sagas_dict() == {
-            "test": models.Saga(name="test", queues=set(), operators={}),
+            "test": schema.Saga(name="test", queues=set(), operators={}),
         }
 
     @patch("sagery.settings.YamlConfigSettingsSource")
@@ -73,7 +73,7 @@ class TestOperator:
     def test_to_model(self, operator_settings: settings.Operator) -> None:
         with patch.object(settings.Operator, "get_operator", return_value=fake) as get_operator_mock:
             model = operator_settings.to_model()
-            assert isinstance(model, models.Operator)
+            assert isinstance(model, schema.Operator)
             assert model.name == "sum2"
             assert model.inputs == {"a", "b"}
             assert model.outputs == {"c"}
@@ -84,4 +84,4 @@ class TestOperator:
 class TestSaga:
     def test_to_model(self, saga_settings: settings.Saga) -> None:
         saga = saga_settings.to_model()
-        assert isinstance(saga, models.Saga)
+        assert isinstance(saga, schema.Saga)

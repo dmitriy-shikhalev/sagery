@@ -9,15 +9,13 @@ from sagery.enums import JobStatus, OperatorStatus
 from sagery.operators import AbstractOperator
 
 
-class Saga(BaseModel):
+class Saga:  # todo
     name: str
     queues: set[str]
     operators: dict[str, Operator]
 
 
-class Operator(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True)
-
+class Operator:  # todo
     name: str
     object: AbstractOperator = Field(exclude=True)
     inputs: set[str]
