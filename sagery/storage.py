@@ -3,7 +3,43 @@ import uuid
 
 from sagery.enums import JobStatus
 from sagery.manager import Manager
-from sagery.models import Job, Saga, Stream
+from sagery.models import Job, Saga, Stream, Operator
+from sagery.operators import AbstractOperator
+
+
+class Launch:
+    def __init__(self, inputs: list[str], outputs: list[str], object: AbstractOperator) -> None:
+        self.inputs = inputs
+        self.outputs = outputs
+        self.object = object
+
+
+class Job:
+    task: asyncio.Task | None = None
+
+    def __init__(self, saga: Saga, comment: str):
+        self.id = uuid.uuid4().hex
+        self.saga = saga
+        self.comment = comment
+        self.status = JobStatus.PREPARING
+
+        streams = {
+            queue_name: asyncio.Queue()
+            for queue_name in sagas.queues
+        }
+        launches = {
+            name: operator.object()
+            for name, operator in saga.operators.items()
+        }
+
+        self.streams = streams
+        self.launches = launches
+
+    async def run(self) -> None:
+        raise NotImplementedError
+
+    async def start(self) -> None:
+        self._task = asyncio.create_task(self.run())
 
 
 class Storage:
@@ -14,20 +50,9 @@ class Storage:
     def __getitem__(self, key: str) -> Job:
         return self._storage[key]
 
-    def create_job(self, saga_name: str, comment: str = "") -> str:
-        job_id = str(uuid.uuid4())
-        streams = {
-            queue_name: Stream(queue_name=queue_name, values=[])
-            for queue_name in self.sagas_dict[saga_name].queues
-        }
-        self._storage[job_id] = Job(
-            id=job_id,
-            saga_name=saga_name,
-            status=JobStatus.PREPARING,
-            comment=comment,
-            streams=streams,
-            manager=Manager(self.sagas_dict[saga_name], streams),
-        )
-        return job_id
+    def create_job(self, saga_name: str, comment: str) -> str:
+        saga = self.sagas_dict[saga_name]
+        job = Job(saga, comment)
+        return job.id
 
 
