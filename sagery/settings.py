@@ -10,9 +10,9 @@ from pydantic_settings import (
 )
 
 from sagery.enums import QueueEngine
+from sagery.operators import AbstractOperator
 from sagery.schema import Operator as ModelOperator
 from sagery.schema import Saga as ModelSaga
-from sagery.operators import AbstractOperator
 
 
 class LocalQueueSettings(BaseSettings):

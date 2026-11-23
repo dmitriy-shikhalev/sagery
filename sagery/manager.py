@@ -1,7 +1,6 @@
-from sagery.schema import Saga, Stream
+from sagery.schema import Saga
 
 
 class Manager:
-    def __init__(self, saga: Saga, streams: dict[str, Stream]):
+    def __init__(self, saga: Saga):
         self.saga = saga
-        self.streams = streams

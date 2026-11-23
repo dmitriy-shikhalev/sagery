@@ -2,7 +2,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from sagery import enums, schema, operators, settings
+from sagery import enums, operators, schema, settings
 
 fake = operators.sum_2()
 

@@ -2,9 +2,8 @@ import asyncio
 import uuid
 
 from sagery.enums import JobStatus
-from sagery.manager import Manager
-from sagery.schema import Saga, Operator
 from sagery.operators import AbstractOperator
+from sagery.schema import Saga
 
 
 class Launch:
@@ -26,14 +25,8 @@ class Job:
         self.comment = comment
         self.status = JobStatus.PREPARING
 
-        streams: dict[str, asyncio.Queue] = {
-            queue_name: asyncio.Queue()
-            for queue_name in saga.queues
-        }
-        operators = {
-            name: operator
-            for name, operator in saga.operators.items()
-        }
+        streams: dict[str, asyncio.Queue] = {queue_name: asyncio.Queue() for queue_name in saga.queues}
+        operators = dict(saga.operators.items())
 
         self.streams = streams
         self.operators = operators
@@ -60,5 +53,3 @@ class Storage:
         saga = self.sagas_dict[saga_name]
         job = Job(saga, comment)
         return job.id
-
-

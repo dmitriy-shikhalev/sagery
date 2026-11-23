@@ -6,8 +6,6 @@ from sagery.manager import Manager
 class TestManager:
     def test_init(self) -> None:
         saga = Mock()
-        streams = Mock()
 
-        manager = Manager(saga, streams)
+        manager = Manager(saga)
         assert manager.saga == saga
-        assert manager.streams == streams
