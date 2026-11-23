@@ -10,8 +10,10 @@ logger = logging.getLogger(__name__)
 
 class AbstractOperator(ABC):
     task: asyncio.Task | None = None
+    time: int | None = None
 
-    def __init__(self, /, **kwargs: Any):
+    def __init__(self, /, time: int | None = None, **kwargs: Any):
+        self.time = time
         self.kwargs = kwargs
         self.inputs: asyncio.Queue[tuple[str, Any]] = asyncio.Queue()
         self.outputs: asyncio.Queue[tuple[str, Any]] = asyncio.Queue()
@@ -30,14 +32,15 @@ class AbstractOperator(ABC):
         else:
             return OperatorStatus.RUNNING
 
-    def start(self) -> None:
+    async def start(self) -> None:
         if self.task is not None:
             raise ValueError(f"Try to start operator {self}, that has already started!")
         self.task = asyncio.create_task(self._run_handler())
 
     async def _run_handler(self) -> None:
         try:
-            await self.run()
+            async with asyncio.timeout(self.time):
+                await self.run()
         except Exception as error:
             logger.exception(error, exc_info=True, stack_info=True)
             raise

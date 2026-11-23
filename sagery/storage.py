@@ -3,7 +3,7 @@ import uuid
 
 from sagery.enums import JobStatus
 from sagery.manager import Manager
-from sagery.schema import Job, Saga, Stream, Operator
+from sagery.schema import Saga, Operator
 from sagery.operators import AbstractOperator
 
 
@@ -26,22 +26,25 @@ class Job:
         self.comment = comment
         self.status = JobStatus.PREPARING
 
-        streams = {
+        streams: dict[str, asyncio.Queue] = {
             queue_name: asyncio.Queue()
-            for queue_name in sagas.queues
+            for queue_name in saga.queues
         }
-        launches = {
-            name: operator.object()
+        operators = {
+            name: operator
             for name, operator in saga.operators.items()
         }
 
         self.streams = streams
-        self.launches = launches
+        self.operators = operators
 
     async def run(self) -> None:
         raise NotImplementedError
 
     async def start(self) -> None:
+        for operator in self.operators.values():
+            await operator.object.start()
+
         self._task = asyncio.create_task(self.run())
 
 

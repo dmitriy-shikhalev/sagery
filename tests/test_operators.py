@@ -68,17 +68,17 @@ class TestSum2Operator:
         operator.task.cancelled.assert_called_once_with()
         operator.task.exception.assert_called_once_with()
 
-    def test_start_with_task(self) -> None:
+    async def test_start_with_task(self) -> None:
         operator = sum_2()
         operator.task = Mock()
         with pytest.raises(ValueError):
-            operator.start()
+            await operator.start()
 
     @patch("sagery.operators.asyncio.create_task")
-    def test_start_without_task(self, create_task_mock: Mock) -> None:
+    async def test_start_without_task(self, create_task_mock: Mock) -> None:
         operator = sum_2()
         with patch.object(operator, "_run_handler", new_callable=Mock, return_value=Mock()) as _run_handler_mock:
-            operator.start()
+            await operator.start()
 
             _run_handler_mock.assert_called_once_with()
             create_task_mock.assert_called_once_with(_run_handler_mock.return_value)
