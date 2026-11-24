@@ -1,10 +1,16 @@
+from asyncio import Queue
 from unittest.mock import Mock, patch
 
 import pytest
 
 from sagery import enums, operators, schema, settings
 
-fake = operators.sum_2()
+input_queue: Queue = Queue()
+input_queue.put_nowait(None)
+
+output_queue: Queue = Queue()
+
+fake = operators.sum_2({"input_queue": input_queue}, {"output_queue": output_queue})
 
 
 class TestSettings:
