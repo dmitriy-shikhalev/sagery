@@ -32,7 +32,7 @@ class Job:
         self.operators = operators
 
     async def run(self) -> None:
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     async def start(self) -> None:
         for operator in self.operators.values():
@@ -52,4 +52,5 @@ class Storage:
     def create_job(self, saga_name: str, comment: str) -> str:
         saga = self.sagas_dict[saga_name]
         job = Job(saga, comment)
+        self._storage[job.id] = job
         return job.id

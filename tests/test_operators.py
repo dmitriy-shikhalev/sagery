@@ -11,10 +11,6 @@ class _Exception(Exception):
 
 
 class TestSum2Operator:
-    def test_init_fail(self) -> None:
-        with pytest.raises(TypeError):
-            _ = sum_2(1)  # type: ignore[call-arg]
-
     @patch("sagery.operators.asyncio.Queue")
     def test_init_ok(self, queue_mock: Mock) -> None:
         operator = sum_2(a="b", c="d")

@@ -14,9 +14,13 @@ class TestSettings:
             api=settings.ApiSettings(host="test", port=123),
             queue=settings.QueueSettings(engine=enums.QueueEngine.LOCAL),
         )
-        assert settings_obj.get_sagas_dict() == {
-            "test": schema.Saga(name="test", queues=set(), operators={}),
-        }
+        sagas = settings_obj.get_sagas_dict()
+        assert len(sagas) == 1
+        assert list(sagas.keys()) == ["test"]
+        saga = list(sagas.values())[0]
+        assert saga.name == "test"
+        assert saga.queues == set()
+        assert saga.operators == {}
 
     @patch("sagery.settings.YamlConfigSettingsSource")
     def test_settings_customise_sources(self, source_mock: Mock) -> None:
