@@ -9,7 +9,6 @@ from pydantic_settings import (
     YamlConfigSettingsSource,
 )
 
-from sagery.enums import QueueEngine
 from sagery.operators import AbstractOperator
 from sagery.schema import Operator as ModelOperator
 from sagery.schema import Saga as ModelSaga
@@ -24,12 +23,6 @@ class RabbitMQSettings(BaseSettings):
     port: str
     login: str
     password: str
-
-
-class QueueSettings(BaseModel):
-    engine: QueueEngine
-    local_queue: LocalQueueSettings | None = None
-    rabbitmq: RabbitMQSettings | None = None
 
 
 class ApiSettings(BaseModel):
@@ -80,7 +73,6 @@ class Settings(BaseSettings):
 
     sagas: list[Saga]
     api: ApiSettings
-    queue: QueueSettings
 
     def get_sagas_dict(self) -> dict[str, ModelSaga]:
         return {s.name: s.to_model() for s in self.sagas}

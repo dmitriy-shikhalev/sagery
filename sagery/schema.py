@@ -11,8 +11,6 @@ class Saga:
 
 
 class Operator:
-    def __init__(self, name: str, object: AbstractOperator, inputs: set[str], outputs: set[str]):
+    def __init__(self, name: str, object: AbstractOperator):
         self.name = name
         self.object = object
-        self.inputs = inputs
-        self.outputs = outputs

@@ -18,7 +18,6 @@ class TestSettings:
         settings_obj = settings.Settings(
             sagas=[settings.Saga(name="test", queues=[], operators=[])],
             api=settings.ApiSettings(host="test", port=123),
-            queue=settings.QueueSettings(engine=enums.QueueEngine.LOCAL),
         )
         sagas = settings_obj.get_sagas_dict()
         assert len(sagas) == 1
