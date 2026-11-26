@@ -11,6 +11,6 @@ class Saga:
 
 
 class Operator:
-    def __init__(self, name: str, object: AbstractOperator):
+    def __init__(self, name: str, operator_cls: type[AbstractOperator]):
         self.name = name
-        self.object = object
+        self.operator_cls = operator_cls

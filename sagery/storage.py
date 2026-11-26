@@ -25,18 +25,20 @@ class Job:
         self.comment = comment
         self.status = JobStatus.PREPARING
 
-        streams: dict[str, asyncio.Queue] = {queue_name: asyncio.Queue() for queue_name in saga.queues}
-        operators = dict(saga.operators.items())
+        queues: dict[str, asyncio.Queue] = {queue_name: asyncio.Queue() for queue_name in saga.queues}
+        operator_saga_dict = dict(saga.operators.items())
 
-        self.streams = streams
-        self.operators = operators
+        self.queues = queues
+        self.operator_saga_dict = operator_saga_dict
+        self.operators: dict[str, AbstractOperator] = {}
 
     async def run(self) -> None:
         raise NotImplementedError  # pragma: no cover
 
     async def start(self) -> None:
-        for operator in self.operators.values():
-            await operator.object.start()
+        for operator_saga in self.operator_saga_dict.values():
+            operator = operator_saga.operator_cls(self.queues)
+            await operator.start()
 
         self._task = asyncio.create_task(self.run())
 

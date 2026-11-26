@@ -51,7 +51,6 @@ def operator_settings() -> settings.Operator:
         module="operators",
         klass="sum_2",
         name="sum2",
-        params={},
     )
 
 
@@ -67,7 +66,7 @@ def saga_settings(operator_settings: settings.Operator) -> settings.Saga:
 class TestOperator:
     def test_get_operator_ok(self, operator_settings: settings.Operator) -> None:
         operator = operator_settings.get_operator()
-        assert isinstance(operator, operators.sum_2)
+        assert operator is operators.sum_2
 
     def test_get_operator_value_error(self, operator_settings: settings.Operator) -> None:
         with (
@@ -83,7 +82,7 @@ class TestOperator:
             assert isinstance(model, schema.Operator)
             assert model.name == "sum2"
             get_operator_mock.assert_called_once_with()
-            assert model.object == get_operator_mock.return_value
+            assert model.operator_cls == get_operator_mock.return_value
 
 
 class TestSaga:

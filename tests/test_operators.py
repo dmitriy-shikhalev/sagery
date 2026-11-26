@@ -14,24 +14,19 @@ class TestSum2Operator:
     @patch("sagery.operators.asyncio.Queue")
     def test_init_ok(self, queue_mock: Mock) -> None:
         queues = Mock()
-        timeout = Mock()
-        operator = sum_2(queues, timeout)
+        operator = sum_2(queues)
 
-        assert operator.kwargs == {}
         queue_mock.assert_not_called()
         assert operator._queues == queues
-        assert operator.timeout == timeout
 
     def test_status_empty(self) -> None:
         queues = Mock()
-        timeout = Mock()
-        operator = sum_2(queues, timeout)
+        operator = sum_2(queues)
         assert operator.status == OperatorStatus.NOT_STARTED
 
     def test_status_done_false(self) -> None:
         queues = Mock()
-        timeout = Mock()
-        operator = sum_2(queues, timeout)
+        operator = sum_2(queues)
         operator.task = Mock(done=Mock(return_value=False))
         assert operator.status == OperatorStatus.RUNNING
 
@@ -75,8 +70,7 @@ class TestSum2Operator:
 
     async def test_start_with_task(self) -> None:
         queues = Mock()
-        timeout = Mock()
-        operator = sum_2(queues, timeout)
+        operator = sum_2(queues)
         operator.task = Mock()
         with pytest.raises(ValueError):
             await operator.start()
@@ -84,8 +78,7 @@ class TestSum2Operator:
     @patch("sagery.operators.asyncio.create_task")
     async def test_start_without_task(self, create_task_mock: Mock) -> None:
         queues = Mock()
-        timeout = Mock()
-        operator = sum_2(queues, timeout)
+        operator = sum_2(queues)
         with patch.object(operator, "_run_handler", new_callable=Mock, return_value=Mock()) as _run_handler_mock:
             await operator.start()
 
@@ -95,8 +88,7 @@ class TestSum2Operator:
 
     async def test_run_handler_ok(self) -> None:
         queues = Mock()
-        timeout = Mock()
-        operator = sum_2(queues, timeout)
+        operator = sum_2(queues)
         with patch.object(operator, "run") as run_mock:
             await operator._run_handler()
 
@@ -104,8 +96,7 @@ class TestSum2Operator:
 
     async def test_run_handler_error(self) -> None:
         queues = Mock()
-        timeout = Mock()
-        operator = sum_2(queues, timeout)
+        operator = sum_2(queues)
         with patch.object(operator, "run", side_effect=_Exception()) as run_mock:
             with pytest.raises(_Exception):
                 await operator._run_handler()

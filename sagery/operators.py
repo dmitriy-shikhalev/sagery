@@ -16,12 +16,8 @@ class AbstractOperator(ABC):
     def __init__(
         self,
         queues: dict[str, asyncio.Queue[Any]],
-        timeout: float | None = None,
-        **kwargs: dict[str, Any],
     ) -> None:
         self._queues = queues
-        self.timeout = timeout
-        self.kwargs = kwargs
 
     @property
     def queues(self) -> dict[str, asyncio.Queue[Any]]:
@@ -48,8 +44,7 @@ class AbstractOperator(ABC):
 
     async def _run_handler(self) -> None:
         try:
-            async with asyncio.timeout(self.time):
-                await self.run()
+            await self.run()
         except Exception as error:
             logger.exception(error, exc_info=True, stack_info=True)
             raise
