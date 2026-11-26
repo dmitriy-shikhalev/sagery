@@ -3,14 +3,14 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from sagery import enums, operators, schema, settings
+from sagery import operators, schema, settings
 
 input_queue: Queue = Queue()
 input_queue.put_nowait(None)
 
 output_queue: Queue = Queue()
 
-fake = operators.sum_2({"input_queue": input_queue}, {"output_queue": output_queue})
+fake = operators.sum_2(queues={"input_queue": input_queue, "output_queue": output_queue})
 
 
 class TestSettings:
@@ -51,8 +51,6 @@ def operator_settings() -> settings.Operator:
         module="operators",
         klass="sum_2",
         name="sum2",
-        inputs=["a", "b"],
-        outputs=["c"],
         params={},
     )
 
@@ -84,8 +82,6 @@ class TestOperator:
             model = operator_settings.to_model()
             assert isinstance(model, schema.Operator)
             assert model.name == "sum2"
-            assert model.inputs == {"a", "b"}
-            assert model.outputs == {"c"}
             get_operator_mock.assert_called_once_with()
             assert model.object == get_operator_mock.return_value
 

@@ -1,4 +1,4 @@
-from unittest.mock import AsyncMock, Mock, call, patch
+from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
@@ -13,19 +13,25 @@ class _Exception(Exception):
 class TestSum2Operator:
     @patch("sagery.operators.asyncio.Queue")
     def test_init_ok(self, queue_mock: Mock) -> None:
-        operator = sum_2(a="b", c="d")
+        queues = Mock()
+        timeout = Mock()
+        operator = sum_2(queues, timeout)
 
-        assert operator.kwargs == {"a": "b", "c": "d"}
-        assert queue_mock.call_args_list == [call(), call()]
-        assert operator.inputs == queue_mock.return_value
-        assert operator.outputs == queue_mock.return_value
+        assert operator.kwargs == {}
+        queue_mock.assert_not_called()
+        assert operator._queues == queues
+        assert operator.timeout == timeout
 
     def test_status_empty(self) -> None:
-        operator = sum_2()
+        queues = Mock()
+        timeout = Mock()
+        operator = sum_2(queues, timeout)
         assert operator.status == OperatorStatus.NOT_STARTED
 
     def test_status_done_false(self) -> None:
-        operator = sum_2()
+        queues = Mock()
+        timeout = Mock()
+        operator = sum_2(queues, timeout)
         operator.task = Mock(done=Mock(return_value=False))
         assert operator.status == OperatorStatus.RUNNING
 
@@ -34,7 +40,8 @@ class TestSum2Operator:
         operator.task.exception.assert_not_called()
 
     def test_status_done_true_cancelled_true(self) -> None:
-        operator = sum_2()
+        queues = Mock()
+        operator = sum_2(queues)
         operator.task = Mock(done=Mock(return_value=True), cancelled=Mock(return_value=True))
         assert operator.status == OperatorStatus.ABORTED
 
@@ -43,7 +50,8 @@ class TestSum2Operator:
         operator.task.exception.assert_not_called()
 
     def test_status_done_true_cancelled_false_exception_not_null(self) -> None:
-        operator = sum_2()
+        queues = Mock()
+        operator = sum_2(queues)
         operator.task = Mock(
             done=Mock(return_value=True), cancelled=Mock(return_value=False), exception=Mock(return_value=Mock())
         )
@@ -54,7 +62,8 @@ class TestSum2Operator:
         operator.task.exception.assert_called_once_with()
 
     def test_status_done_true_cancelled_false_exception_null(self) -> None:
-        operator = sum_2()
+        queues = Mock()
+        operator = sum_2(queues)
         operator.task = Mock(
             done=Mock(return_value=True), cancelled=Mock(return_value=False), exception=Mock(return_value=None)
         )
@@ -65,14 +74,18 @@ class TestSum2Operator:
         operator.task.exception.assert_called_once_with()
 
     async def test_start_with_task(self) -> None:
-        operator = sum_2()
+        queues = Mock()
+        timeout = Mock()
+        operator = sum_2(queues, timeout)
         operator.task = Mock()
         with pytest.raises(ValueError):
             await operator.start()
 
     @patch("sagery.operators.asyncio.create_task")
     async def test_start_without_task(self, create_task_mock: Mock) -> None:
-        operator = sum_2()
+        queues = Mock()
+        timeout = Mock()
+        operator = sum_2(queues, timeout)
         with patch.object(operator, "_run_handler", new_callable=Mock, return_value=Mock()) as _run_handler_mock:
             await operator.start()
 
@@ -81,14 +94,18 @@ class TestSum2Operator:
             assert operator.task == create_task_mock.return_value
 
     async def test_run_handler_ok(self) -> None:
-        operator = sum_2()
+        queues = Mock()
+        timeout = Mock()
+        operator = sum_2(queues, timeout)
         with patch.object(operator, "run") as run_mock:
             await operator._run_handler()
 
             run_mock.assert_called_once_with()
 
     async def test_run_handler_error(self) -> None:
-        operator = sum_2()
+        queues = Mock()
+        timeout = Mock()
+        operator = sum_2(queues, timeout)
         with patch.object(operator, "run", side_effect=_Exception()) as run_mock:
             with pytest.raises(_Exception):
                 await operator._run_handler()
@@ -96,39 +113,11 @@ class TestSum2Operator:
             run_mock.assert_called_once_with()
 
     async def test_run_ok(self) -> None:
-        operator = sum_2()
+        queues = {"a": Mock(get=AsyncMock(return_value=1)), "b": Mock(get=AsyncMock(return_value=2)), "c": AsyncMock()}
+        operator = sum_2(queues)  # type: ignore[arg-type]
 
-        with (
-            patch.object(operator, "inputs", Mock(get=AsyncMock(side_effect=[("a", 1), ("b", 2)]))) as inputs_mock,
-            patch.object(operator, "outputs", Mock(put=AsyncMock())) as output_mock,
-        ):
-            await operator.run()
+        await operator.run()
 
-            assert inputs_mock.get.call_args_list == [call(), call()]
-            output_mock.put.assert_called_once_with(("c", 3))
-
-    async def test_run_1_arg_wrong(self) -> None:
-        operator = sum_2()
-
-        with (
-            patch.object(operator, "inputs", Mock(get=AsyncMock(side_effect=[("b", 1), ("b", 2)]))) as inputs_mock,
-            patch.object(operator, "outputs", Mock(put=AsyncMock())) as output_mock,
-        ):
-            with pytest.raises(NameError):
-                await operator.run()
-
-            assert inputs_mock.get.call_args_list == [call()]
-            output_mock.put.assert_not_called()
-
-    async def test_run_2_arg_wrong(self) -> None:
-        operator = sum_2()
-
-        with (
-            patch.object(operator, "inputs", Mock(get=AsyncMock(side_effect=[("a", 1), ("a", 2)]))) as inputs_mock,
-            patch.object(operator, "outputs", Mock(put=AsyncMock())) as output_mock,
-        ):
-            with pytest.raises(NameError):
-                await operator.run()
-
-            assert inputs_mock.get.call_args_list == [call(), call()]
-            output_mock.put.assert_not_called()
+        queues["a"].get.assert_called_once_with()
+        queues["b"].get.assert_called_once_with()
+        queues["c"].put.assert_called_once_with(3)

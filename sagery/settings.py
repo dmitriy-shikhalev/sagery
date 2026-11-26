@@ -14,17 +14,6 @@ from sagery.schema import Operator as ModelOperator
 from sagery.schema import Saga as ModelSaga
 
 
-class LocalQueueSettings(BaseSettings):
-    pass
-
-
-class RabbitMQSettings(BaseSettings):
-    host: str
-    port: str
-    login: str
-    password: str
-
-
 class ApiSettings(BaseModel):
     host: str
     port: int
@@ -35,8 +24,6 @@ class Operator(BaseSettings):
     module: str
     klass: str
     name: str
-    inputs: list[str]
-    outputs: list[str]
     params: dict[str, Any]
 
     def get_operator(self) -> AbstractOperator:
@@ -50,8 +37,6 @@ class Operator(BaseSettings):
         return ModelOperator(
             name=self.name,
             object=self.get_operator(),
-            inputs=set(self.inputs),
-            outputs=set(self.outputs),
         )
 
 
