@@ -7,17 +7,19 @@ class Storage:
         self.sagas_dict = sagas_dict
         self._storage: dict[str, Job] = {}
 
-    def create_job(self, saga_name: str, comment: str) -> str:
+    def create_job(self, saga_name: str, comment: str) -> Job:
         saga = self.sagas_dict[saga_name]
         job = Job(saga, comment)
         self._storage[job.id] = job
-        return job.id
+        return job
 
     def get_job(self, job_id: str) -> Job:
         return self._storage[job_id]
 
-    def set_processing_job(self, job_id: str) -> Job:
-        raise NotImplementedError
+    async def start_job(self, job_id: str) -> Job:
+        job = self._storage[job_id]
+        await job.start()
+        return job
 
     def cancel_job(self, job_id: str) -> Job:
         raise NotImplementedError

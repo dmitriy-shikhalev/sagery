@@ -26,6 +26,8 @@ class Job:
         raise NotImplementedError  # pragma: no cover
 
     async def start(self) -> None:
+        self.status = JobStatus.PROCESSING
+
         for operator_saga in self.operator_saga_dict.values():
             operator = operator_saga.operator_cls(self.queues)
             await operator.start()
